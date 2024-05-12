@@ -8,6 +8,7 @@ public class Noise
     {
         Local, Global
     };
+
     public static float[,] GenerateNoiseMap(int mapWidth, int mapHeight, float scale, int seed, int octaves, float persistance, float lacunarity, Vector2 offset, NormalizeMode normalizeMode)
     {
         if (scale <= 0)
@@ -46,6 +47,7 @@ public class Noise
                     float temp_x = (j - halfWidth + +octaveOffsets[k].x) / scale * frequency;
                     float temp_y = (i - halfHeight + octaveOffsets[k].y) / scale * frequency;
                     float perlinValue = Mathf.PerlinNoise(temp_x, temp_y) * 2 - 1;
+
                     //noiseMap[j, i] = perlinValue;
                     noiseHeight += perlinValue * amplitude;
                     amplitude *= persistance;

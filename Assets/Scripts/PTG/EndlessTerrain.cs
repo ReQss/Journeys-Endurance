@@ -74,17 +74,20 @@ public class EndlessTerrain : MonoBehaviour
         LODMesh[] lodMeshes;
         LODMesh collisionLODMesh;
         MapData mapData;
+
         bool mapDataReceived;
         int previousLODIndex = -1;
 
         public TerrainChunk(Vector2 coord, int size, LODInfo[] detailsLevels, Transform parent, Material material)
         {
+
             this.detailsLevels = detailsLevels;
             position = coord * size;
             bounds = new Bounds(position, Vector2.one * size);
             Vector3 positionV3 = new Vector3(position.x, 0, position.y);
             meshObject = new GameObject("Terrain Chunk");
-
+            meshObject.layer = LayerMask.NameToLayer("Ground");
+            // meshObject.tag = TagMask
             // 
             meshCollider = meshObject.AddComponent<MeshCollider>();
 
