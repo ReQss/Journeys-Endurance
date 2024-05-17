@@ -5,6 +5,7 @@ using UnityEngine;
 public class MapDisplay : MonoBehaviour
 {
     public Renderer textureRender;
+    public Shader terrainShader;
     public MeshFilter meshFilter;
     public MeshRenderer meshRenderer;
     public void DrawTexture(Texture2D texture)
@@ -16,6 +17,10 @@ public class MapDisplay : MonoBehaviour
     public void DrawMesh(MeshData meshData, Texture2D texture2D)
     {
         meshFilter.sharedMesh = meshData.CreateMesh();
-        meshRenderer.sharedMaterial.mainTexture = texture2D;
+        Shader shader = terrainShader;
+        Material material = new Material(shader);
+        material.mainTexture = texture2D;
+        meshRenderer.sharedMaterial = material;
     }
+
 }

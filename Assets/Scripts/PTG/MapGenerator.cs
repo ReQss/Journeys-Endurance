@@ -10,6 +10,7 @@ public class MapGenerator : MonoBehaviour
     {
         NoiseMap, ColourMap, Mesh, FalloffMap
     };
+    public Gradient gradient;
     public Noise.NormalizeMode normalizeMode;
     public float meshHighMultiplier;
     public AnimationCurve meshHeightCurve;
@@ -30,6 +31,7 @@ public class MapGenerator : MonoBehaviour
     public bool autoUpdate;
     public TerrainType[] regions;
     float[,] falloffMap;
+
     Queue<MapThreadInfo<MapData>> mapDataThreadInfoQueue = new Queue<MapThreadInfo<MapData>>();
     Queue<MapThreadInfo<MeshData>> meshDataThreadInfoQueue = new Queue<MapThreadInfo<MeshData>>();
     void Awake()
@@ -48,7 +50,9 @@ public class MapGenerator : MonoBehaviour
         }
         else if (drawMode == DrawMode.Mesh)
         {
-            mapDisplay.DrawMesh(MeshGenerator.GenerateTerrainMesh(mapData.heightMap, meshHighMultiplier, meshHeightCurve, editorPreviewLOD), TextureGenerator.TextureFromColourMap(mapData.colourMap, mapChunkSize, mapChunkSize));
+            // Texture2D texture = TextureGenerator.TextureFromGradient(mapData.gradientMap, mapChunkSize, mapChunkSize);
+            Texture2D texture = TextureGenerator.TextureFromColourMap(mapData.gradientMap, mapChunkSize, mapChunkSize);
+            mapDisplay.DrawMesh(MeshGenerator.GenerateTerrainMesh(mapData.heightMap, meshHighMultiplier, meshHeightCurve, editorPreviewLOD, gradient), texture);
         }
         else if (drawMode == DrawMode.FalloffMap)
         {
@@ -74,7 +78,7 @@ public class MapGenerator : MonoBehaviour
     }
     void MeshDataThread(MapData mapData, int lod, Action<MeshData> callback)
     {
-        MeshData meshData = MeshGenerator.GenerateTerrainMesh(mapData.heightMap, meshHighMultiplier, meshHeightCurve, lod);
+        MeshData meshData = MeshGenerator.GenerateTerrainMesh(mapData.heightMap, meshHighMultiplier, meshHeightCurve, lod, gradient);
         lock (meshDataThreadInfoQueue)
         {
             meshDataThreadInfoQueue.Enqueue(new MapThreadInfo<MeshData>(callback, meshData));
@@ -112,10 +116,20 @@ public class MapGenerator : MonoBehaviour
     {
         float[,] noiseMap = Noise.GenerateNoiseMap(mapChunkSize, mapChunkSize, noiseScale, seed, octaves, persistance, lacunarity, centre + offset, normalizeMode);
         Color[] colourMap = new Color[mapChunkSize * mapChunkSize];
+        Color[] gradientMap = new Color[mapChunkSize * mapChunkSize];
+        Texture2D[] textureMap = new Texture2D[mapChunkSize * mapChunkSize];
+        float minTerrainHeight = float.MaxValue;
+        float maxTerrainHeight = float.MinValue;
+
         for (int i = 0; i < mapChunkSize; i++)
         {
             for (int j = 0; j < mapChunkSize; j++)
             {
+                float height = noiseMap[j, i];
+                if (height < minTerrainHeight)
+                    minTerrainHeight = height;
+                if (height > maxTerrainHeight)
+                    maxTerrainHeight = height;
                 if (useFalloff)
                 {
                     noiseMap[j, i] = Mathf.Clamp01(noiseMap[j, i] - falloffMap[j, i]);
@@ -126,6 +140,11 @@ public class MapGenerator : MonoBehaviour
                     if (currentHeight >= regions[k].height)
                     {
                         colourMap[i * mapChunkSize + j] = regions[k].colour;
+                        // gradientMap[i * mapChunkSize + j] = gradient.Evaluate(1000);
+                        float normalizedHeight = Mathf.InverseLerp(minTerrainHeight, maxTerrainHeight, currentHeight);
+                        gradientMap[i * mapChunkSize + j] = gradient.Evaluate(normalizedHeight);
+                        // gradientMap[i * mapChunkSize + j] = Color.red;
+                        textureMap[i * mapChunkSize + j] = regions[k].texture;
                     }
                     else
                     {
@@ -134,7 +153,7 @@ public class MapGenerator : MonoBehaviour
                 }
             }
         }
-        return new MapData(noiseMap, colourMap);
+        return new MapData(noiseMap, colourMap, gradientMap);
 
     }
     private void OnValidate()
@@ -169,9 +188,12 @@ public struct MapData
 {
     public readonly float[,] heightMap;
     public readonly Color[] colourMap;
-    public MapData(float[,] heightMap, Color[] colourMap)
+    public readonly Color[] gradientMap;
+
+    public MapData(float[,] heightMap, Color[] colourMap, Color[] gradientMap)
     {
         this.heightMap = heightMap;
         this.colourMap = colourMap;
+        this.gradientMap = gradientMap;
     }
 }

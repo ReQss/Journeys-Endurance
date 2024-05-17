@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 public class EndlessTerrain : MonoBehaviour
 {
-    const float scale = 5f;
+    const float scale = 2f;
     const float viewerMoveThresholdForChunkUpdate = 25f;
     const float sqrviewerMoveThresholdForChunkUpdate = viewerMoveThresholdForChunkUpdate * viewerMoveThresholdForChunkUpdate;
     public LODInfo[] detailsLevels;
@@ -24,6 +24,7 @@ public class EndlessTerrain : MonoBehaviour
         chunkSize = MapGenerator.mapChunkSize - 1;
         chunksVisibleInViewDst = Mathf.RoundToInt(maxViewDst / chunkSize);
         UpdateVisibleChunks();
+
     }
     void Update()
     {
@@ -98,6 +99,8 @@ public class EndlessTerrain : MonoBehaviour
             // meshObject.transform.localScale = Vector3.one * size / 10f;
             meshObject.transform.parent = parent;
             meshObject.transform.localScale = Vector3.one * scale;
+
+
             SetVisible(false);
             lodMeshes = new LODMesh[detailsLevels.Length];
             for (int i = 0; i < detailsLevels.Length; i++)
@@ -152,6 +155,9 @@ public class EndlessTerrain : MonoBehaviour
                         {
                             previousLODIndex = lodIndex;
                             meshFilter.mesh = lodMesh.mesh;
+                            meshCollider.sharedMesh = lodMesh.mesh;
+                            // meshCollider.sharedMesh.ScaleMesh(meshObject.transform.localScale);
+
                             // meshCollider.sharedMesh = lodMesh.mesh;
 
                         }
