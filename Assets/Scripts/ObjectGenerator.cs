@@ -18,6 +18,7 @@ public class ObjectGenerator : MonoBehaviour
     private float radius = 0;
     private bool positionClear = true;
     public int numberOfObjects = 0;
+    public GameObject instantiatedObjectsFolder;
 
     /// <summary>
     /// Start is called on the frame when a script is enabled just before
@@ -71,7 +72,7 @@ public class ObjectGenerator : MonoBehaviour
             {
                 positionClear = false;
                 Debug.Log("Object is colliding with something");
-                Instantiate(GameObject.CreatePrimitive(PrimitiveType.Cube), hit.point, Quaternion.identity);
+                // Instantiate(GameObject.CreatePrimitive(PrimitiveType.Cube), hit.point, Quaternion.identity);
                 continue;
             }
             else positionClear = true;
@@ -82,9 +83,9 @@ public class ObjectGenerator : MonoBehaviour
 
                 Ray objectRay = new Ray(randomPosition, Vector3.down);
                 Debug.DrawRay(randomPosition, Vector3.down * hit.distance, Color.red);
-                // Debug.Log("Object touched ground at position: " + hit.point);
                 GameObject randomPrefab = getRandomObject();
-                Instantiate(randomPrefab, hit.point, Quaternion.identity);
+                GameObject spawnedObject = Instantiate(randomPrefab, hit.point, Quaternion.identity);
+                spawnedObject.transform.SetParent(instantiatedObjectsFolder.transform);
                 positionFound = true;
             }
 
