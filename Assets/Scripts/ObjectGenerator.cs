@@ -6,8 +6,8 @@ using UnityEngine;
 
 public class ObjectGenerator : MonoBehaviour
 {
-    [SerializeField]
-    GameObject prefab; // Prefab of the cube you want to spawn
+    // [SerializeField]
+    // GameObject prefab; // Prefab of the cube you want to spawn
     public List<GameObject> prefabs;
     // [SerializeField]
     public Vector2Int xSize;
@@ -26,15 +26,15 @@ public class ObjectGenerator : MonoBehaviour
     /// </summary>
     void Start()
     {
-        Collider collider = prefab.GetComponent<Collider>();
-        if (collider != null)
-        {
-            radius = collider.bounds.extents.magnitude;
-        }
-        else
-        {
-            Debug.LogWarning("Prefab does not have a collider component.");
-        }
+        // Collider collider = prefab.GetComponent<Collider>();
+        // if (collider != null)
+        // {
+        // radius = collider.bounds.extents.magnitude;
+        // }
+        // else
+        // {
+        //     Debug.LogWarning("Prefab does not have a collider component.");
+        // }
         for (int i = 0; i < numberOfObjects; i++)
         {
             Generate();
