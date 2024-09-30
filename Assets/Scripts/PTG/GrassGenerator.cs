@@ -5,33 +5,39 @@ using UnityEngine.Rendering;
 [System.Serializable]
 public class GrassObject
 {
-    public Mesh highPolyMesh;    // Normal detailed grass mesh
-    public Mesh lowPolyMesh;     // Low-poly version of the grass
+    public Mesh highPolyMesh;
+    public Mesh lowPolyMesh;
     public Material material;
-    public float probability;    // Probability of this grass object being selected
-    public Vector3 scale = Vector3.one; // Scale of this grass object (default is 1,1,1)
+    public float probability;
+    public Vector3 scale = Vector3.one;
 }
-
+[System.Serializable]
+public class TerrainHeight
+{
+    public float grassHeight;
+    public float rockHeight;
+    public float sandHeight;
+}
 public class GrassGenerator : MonoBehaviour
 {
+    public TerrainHeight terrainHeightLevel;
+    public Vector3 terrainCenter;
     public Camera playerCamera;
-    public Transform terrain;   // Reference to the terrain's transform
-    public float chunkSize = 10f; // Size of each chunk
-    private Dictionary<Vector2Int, List<Matrix4x4>> grassChunks; // Store grass by chunk
-    private Dictionary<Vector2Int, GrassObject[]> grassObjectsByChunk; // Store the grass object associated with each chunk
+    public Transform terrain;
+    public float chunkSize = 10f;
+    private Dictionary<Vector2Int, List<Matrix4x4>> grassChunks;
+    private Dictionary<Vector2Int, GrassObject[]> grassObjectsByChunk;
 
-    public List<GrassObject> grassObjects; // List of different grass objects to use
-    public int grassCount = 10000;         // Number of grass blades to generate
-    public float areaSize = 100f;          // Size of the area to cover with grass
-    public LayerMask groundLayer;          // Layer mask to specify the ground mesh layer
-    public Transform player;               // Reference to the player transform
-    public float renderRadius = 50f;       // Radius within which grass will be rendered
-    public float switchDistance = 30f;     // Distance at which to switch between high and low poly
-    private Matrix4x4[] matrices;          // Array to store matrices for each grass blade
-    private GrassObject[] selectedGrassObjects; // Array to store the corresponding grass object for each blade
+    public List<GrassObject> grassObjects;
+    public int grassCount = 10000;
+    public float areaSize = 100f;
+    public LayerMask groundLayer;
+    public Transform player;
+    public float renderRadius = 50f;
+    public float switchDistance = 30f;
     [SerializeField]
     private float adjustGrassHeight = 0.6f;
-    private ComputeBuffer matrixBuffer; // Buffer for grass matrices
+    private ComputeBuffer matrixBuffer;
 
     public float spacingFactor = 0.5f;
 
@@ -57,7 +63,7 @@ public class GrassGenerator : MonoBehaviour
 
     GrassObject SelectGrassObject()
     {
-        float randomValue = Random.value; // Random value between 0 and 1
+        float randomValue = Random.value;
         float cumulativeProbability = 0f;
 
         foreach (var grassObject in grassObjects)
@@ -69,7 +75,7 @@ public class GrassGenerator : MonoBehaviour
             }
         }
 
-        return grassObjects[grassObjects.Count - 1]; // Fallback in case of rounding errors
+        return grassObjects[grassObjects.Count - 1];
     }
 
     void GenerateGrass()
@@ -77,9 +83,8 @@ public class GrassGenerator : MonoBehaviour
         grassChunks = new Dictionary<Vector2Int, List<Matrix4x4>>();
         grassObjectsByChunk = new Dictionary<Vector2Int, GrassObject[]>();
 
-        Vector3 terrainCenter = terrain.position; // Get the terrain center
-
-        int rowCount = Mathf.CeilToInt(Mathf.Sqrt(grassCount)); // Number of rows and columns
+        Debug.Log(terrainCenter);
+        int rowCount = Mathf.CeilToInt(Mathf.Sqrt(grassCount));
         float cellSize = (areaSize / rowCount) * spacingFactor;
 
         int index = 0;
@@ -91,16 +96,23 @@ public class GrassGenerator : MonoBehaviour
                 if (index >= grassCount)
                     return;
 
-                // Adjust position based on the terrain center
                 Vector3 position = new Vector3(
-                    (x * cellSize) + terrainCenter.x - (areaSize / 2f),
-                    100f, // Start raycasting from a high position above the ground
-                    (z * cellSize) + terrainCenter.z - (areaSize / 2f)
+                    (x * cellSize) - (areaSize / 2f) + terrainCenter.x
+                    ,
+                    100f,
+                    (z * cellSize) - (areaSize / 2f) + terrainCenter.z
                 );
 
                 if (Physics.Raycast(position, Vector3.down, out RaycastHit hit, Mathf.Infinity, groundLayer))
                 {
+
                     position = hit.point;
+
+                    if (position.y > terrainHeightLevel.rockHeight || position.y < terrainHeightLevel.sandHeight)
+                    {
+                        // index++;
+                        continue;
+                    }
                     position.y += adjustGrassHeight;
 
                     float randomScaleFactor = Random.Range(0.8f, 1.8f);
@@ -129,7 +141,7 @@ public class GrassGenerator : MonoBehaviour
             }
         }
 
-        matrixBuffer = new ComputeBuffer(grassCount, 64); // 64 bytes per Matrix4x4
+        matrixBuffer = new ComputeBuffer(grassCount, 64);
     }
 
     void Update()
@@ -149,7 +161,20 @@ public class GrassGenerator : MonoBehaviour
                 chunkCoord.y * chunkSize + chunkSize / 2
             );
 
-            Bounds chunkBounds = new Bounds(chunkCenter, new Vector3(chunkSize, 100f, chunkSize));
+            float minY = Mathf.Infinity;
+            float maxY = -Mathf.Infinity;
+            foreach (var matrix in kvp.Value)
+            {
+                float yPos = matrix.GetColumn(3).y;
+                if (yPos < minY) minY = yPos;
+                if (yPos > maxY) maxY = yPos;
+            }
+
+            float chunkHeight = maxY - minY;
+            Bounds chunkBounds = new Bounds(
+                new Vector3(chunkCenter.x, (minY + maxY) / 2, chunkCenter.z),
+                new Vector3(chunkSize, chunkHeight, chunkSize)
+            );
 
             if (GeometryUtility.TestPlanesAABB(frustumPlanes, chunkBounds))
             {
@@ -182,7 +207,7 @@ public class GrassGenerator : MonoBehaviour
             }
         }
 
-        // Use GPU instancing for high-poly and low-poly grass
+        // Render high-poly grass
         foreach (var kvp in visibleHighPolyGrass)
         {
             if (kvp.Value.Count > 0)
@@ -192,6 +217,7 @@ public class GrassGenerator : MonoBehaviour
             }
         }
 
+        // Render low-poly grass
         foreach (var kvp in visibleLowPolyGrass)
         {
             if (kvp.Value.Count > 0)
@@ -201,6 +227,7 @@ public class GrassGenerator : MonoBehaviour
             }
         }
     }
+
 
     void OnDestroy()
     {
