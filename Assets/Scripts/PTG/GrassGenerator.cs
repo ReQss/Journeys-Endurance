@@ -25,9 +25,8 @@ public class GrassGenerator : MonoBehaviour
     public Camera playerCamera;
     public Transform terrain;
     public float chunkSize = 10f;
-    private Dictionary<Vector2Int, List<Matrix4x4>> grassChunks;
-    private Dictionary<Vector2Int, GrassObject[]> grassObjectsByChunk;
-
+    private Dictionary<Vector2Int, List<Matrix4x4>> grassChunks = new Dictionary<Vector2Int, List<Matrix4x4>>();
+    private Dictionary<Vector2Int, GrassObject[]> grassObjectsByChunk = new Dictionary<Vector2Int, GrassObject[]>();
     public List<GrassObject> grassObjects;
     public int grassCount = 10000;
     public float areaSize = 100f;
@@ -80,12 +79,8 @@ public class GrassGenerator : MonoBehaviour
 
     void GenerateGrass()
     {
-        grassChunks = new Dictionary<Vector2Int, List<Matrix4x4>>();
-        grassObjectsByChunk = new Dictionary<Vector2Int, GrassObject[]>();
-
-        Debug.Log(terrainCenter);
         int rowCount = Mathf.CeilToInt(Mathf.Sqrt(grassCount));
-        float cellSize = (areaSize / rowCount) * spacingFactor;
+        float cellSize = areaSize / rowCount * spacingFactor;
 
         int index = 0;
 
@@ -95,11 +90,11 @@ public class GrassGenerator : MonoBehaviour
             {
                 if (index >= grassCount)
                     return;
-
+                float randomPositionOffset = Random.Range(0f, 1f);
                 Vector3 position = new Vector3(
-                    (x * cellSize) - (areaSize / 2f) + terrainCenter.x
+                    (x * cellSize) - (areaSize / 2f) + terrainCenter.x + randomPositionOffset
                     ,
-                    100f,
+                    100f, randomPositionOffset +
                     (z * cellSize) - (areaSize / 2f) + terrainCenter.z
                 );
 
@@ -107,21 +102,20 @@ public class GrassGenerator : MonoBehaviour
                 {
 
                     position = hit.point;
-
                     if (position.y > terrainHeightLevel.rockHeight || position.y < terrainHeightLevel.sandHeight)
                     {
-                        // index++;
                         continue;
                     }
                     position.y += adjustGrassHeight;
 
-                    float randomScaleFactor = Random.Range(0.8f, 1.8f);
-                    Quaternion rotation = Quaternion.Euler(0, Random.Range(0f, 360f), 0);
+                    float randomScaleFactor = Random.Range(0.8f, 1.5f);
+                    Quaternion rotation = Quaternion.FromToRotation(Vector3.up, hit.normal);
+
 
                     Vector2Int chunkCoord = new Vector2Int(
-                        Mathf.FloorToInt(position.x / chunkSize),
-                        Mathf.FloorToInt(position.z / chunkSize)
-                    );
+                         Mathf.FloorToInt(position.x / chunkSize),
+                         Mathf.FloorToInt(position.z / chunkSize)
+                     );
 
                     GrassObject selectedGrassObject = SelectGrassObject();
                     Vector3 finalScale = selectedGrassObject.scale * randomScaleFactor;
@@ -207,7 +201,6 @@ public class GrassGenerator : MonoBehaviour
             }
         }
 
-        // Render high-poly grass
         foreach (var kvp in visibleHighPolyGrass)
         {
             if (kvp.Value.Count > 0)
@@ -217,7 +210,6 @@ public class GrassGenerator : MonoBehaviour
             }
         }
 
-        // Render low-poly grass
         foreach (var kvp in visibleLowPolyGrass)
         {
             if (kvp.Value.Count > 0)

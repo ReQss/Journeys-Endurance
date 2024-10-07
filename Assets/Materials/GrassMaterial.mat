@@ -34,7 +34,8 @@ Material:
   m_CustomRenderQueue: 2450
   stringTagMap:
     RenderType: TransparentCutout
-  disabledShaderPasses: []
+  disabledShaderPasses:
+  - SHADOWCASTER
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -91,6 +92,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_3d510970c6fb46e6ba14e6ab52a4f712_Texture_1_Texture2D:
+        m_Texture: {fileID: 2800000, guid: 0bfd34846cafe9d47b80f7311f2bae8a, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _SampleTexture2D_8644bfbe496d475e8d45e1f2037eb92a_Texture_1_Texture2D:
         m_Texture: {fileID: 2800000, guid: 6667d5ccb271112498650b5fb5f14ff5, type: 3}
         m_Scale: {x: 1, y: 1}
@@ -101,6 +106,10 @@ Material:
         m_Offset: {x: 0, y: 0}
     - _Texture2D:
         m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _object_texture:
+        m_Texture: {fileID: 2800000, guid: 6667d5ccb271112498650b5fb5f14ff5, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:
@@ -124,7 +133,7 @@ Material:
     - _BlendModePreserveSpecular: 1
     - _BlendOp: 0
     - _BumpScale: 1
-    - _CastShadows: 1
+    - _CastShadows: 0
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
     - _Cull: 0

@@ -695,7 +695,7 @@
     "m_ShaderOutputName": "Edge2",
     "m_StageCapability": 3,
     "m_Value": {
-        "x": 4.0,
+        "x": 15.800000190734864,
         "y": 1.0,
         "z": 1.0,
         "w": 1.0
@@ -1531,10 +1531,10 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": 247.33328247070313,
-            "y": 972.6666259765625,
-            "width": 209.33340454101563,
-            "height": 438.66650390625
+            "x": 193.33338928222657,
+            "y": 1009.3333740234375,
+            "width": 209.33335876464845,
+            "height": 438.6666259765625
         }
     },
     "m_Slots": [
@@ -2101,7 +2101,7 @@
     "m_ShaderOutputName": "Edge1",
     "m_StageCapability": 3,
     "m_Value": {
-        "x": -4.0,
+        "x": 14.9399995803833,
         "y": 0.0,
         "z": 0.0,
         "w": 0.0
@@ -2462,10 +2462,10 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": 247.33335876464845,
-            "y": 1411.3333740234375,
-            "width": 209.3332977294922,
-            "height": 438.6666259765625
+            "x": 193.33338928222657,
+            "y": 1448.0,
+            "width": 209.33335876464845,
+            "height": 438.666748046875
         }
     },
     "m_Slots": [
@@ -2602,7 +2602,7 @@
     "m_ShaderOutputName": "Edge2",
     "m_StageCapability": 3,
     "m_Value": {
-        "x": 200.0,
+        "x": 59.5,
         "y": 1.0,
         "z": 1.0,
         "w": 1.0
@@ -3325,7 +3325,7 @@
     "m_ShaderOutputName": "Edge2",
     "m_StageCapability": 3,
     "m_Value": {
-        "x": 30.0,
+        "x": 22.600000381469728,
         "y": 1.0,
         "z": 1.0,
         "w": 1.0
@@ -3504,7 +3504,7 @@
     "m_ShaderOutputName": "Edge1",
     "m_StageCapability": 3,
     "m_Value": {
-        "x": -10.0,
+        "x": 15.899999618530274,
         "y": 0.0,
         "z": 0.0,
         "w": 0.0
@@ -3769,7 +3769,7 @@
     "m_ShaderOutputName": "Edge1",
     "m_StageCapability": 3,
     "m_Value": {
-        "x": 0.0,
+        "x": 11.899999618530274,
         "y": 0.0,
         "z": 0.0,
         "w": 0.0
