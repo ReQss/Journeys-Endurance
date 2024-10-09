@@ -11,7 +11,7 @@ public class AddCollider : MonoBehaviour
     /// </summary>
     void Awake()
     {
-        mesh = GameObject.Find("Mesh");
+        mesh = GameObject.Find("Terrain");
 
         mesh.AddComponent<MeshCollider>();
     }

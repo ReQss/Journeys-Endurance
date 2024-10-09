@@ -5,13 +5,17 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Security.Cryptography;
 using System.Threading;
+using Cinemachine;
 using UnityEngine;
 
 public class ThirdPersonMovement : MonoBehaviour
 {
+    public Interactable focus;
     public Animator animator;
     public CharacterController controller;
     public Transform cam;
+    public Camera cinemachineCamera;
+    Camera camera;
 
     public float speed = 6;
     private float runSpeed = 1.5f;
@@ -26,6 +30,9 @@ public class ThirdPersonMovement : MonoBehaviour
 
     float turnSmoothVelocity;
     public float turnSmoothTime = 0.1f;
+    private bool cursorLocked = true;
+    public float pickUpDistance = 80f;
+
     /// <summary>
     /// Start is called on the frame when a script is enabled just before
     /// any of the Update methods is called the first time.
@@ -33,11 +40,27 @@ public class ThirdPersonMovement : MonoBehaviour
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
+        camera = Camera.main;
         // animator = GetComponent<Animator>();
     }
     // Update is called once per frame
     void Update()
     {
+
+        if (Input.GetKeyDown(KeyCode.LeftControl))
+        {
+            if (cursorLocked)
+            {
+                Cursor.lockState = CursorLockMode.None;
+                camera.GetComponent<CinemachineBrain>().enabled = false;
+            }
+            else
+            {
+                camera.GetComponent<CinemachineBrain>().enabled = true;
+                Cursor.lockState = CursorLockMode.Locked;
+            }
+            cursorLocked = !cursorLocked;
+        }
         bool isWalking = animator.GetBool("Walk");
         bool isRunning = animator.GetBool("Run");
         bool runPressed = Input.GetKey("right shift");
@@ -61,7 +84,7 @@ public class ThirdPersonMovement : MonoBehaviour
         float vertical = Input.GetAxisRaw("Vertical");
         Vector3 direction = new Vector3(horizontal, 0f, vertical).normalized;
 
-        if (direction.magnitude >= 0.1f)
+        if (direction.magnitude >= 0.1f && cursorLocked == true)
         {
             float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + cam.eulerAngles.y;
             float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
@@ -88,5 +111,33 @@ public class ThirdPersonMovement : MonoBehaviour
         }
         animator.SetBool("Walk", isWalking);
         animator.SetBool("Run", isRunning);
+        Ray ray = camera.ScreenPointToRay(Input.mousePosition);
+        Debug.DrawRay(ray.origin, ray.direction * pickUpDistance, Color.red);
+        if (Input.GetMouseButtonDown(0))
+        {
+
+            RaycastHit hit;
+
+            if (Physics.Raycast(ray, out hit, pickUpDistance))
+            {
+
+                Debug.Log(hit.collider.gameObject.name);
+                Interactable interactable = hit.collider.GetComponent<Interactable>();
+
+                if (interactable != null)
+                {
+                    if (interactable.pickedUp == false)
+                    {
+                        InventoryManager.Instance.addItem(interactable);
+                        interactable.gameObject.SetActive(false);
+                    }
+                    interactable.pickedUp = true;
+                    Debug.Log("Interact");
+                }
+
+            }
+        }
     }
+
+
 }
