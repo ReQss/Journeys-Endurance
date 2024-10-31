@@ -30,7 +30,7 @@ public class ThirdPersonMovement : MonoBehaviour
 
     float turnSmoothVelocity;
     public float turnSmoothTime = 0.1f;
-    private bool cursorLocked = true;
+    public static bool cursorLocked = true;
     public float pickUpDistance = 80f;
 
     /// <summary>
@@ -111,32 +111,7 @@ public class ThirdPersonMovement : MonoBehaviour
         }
         animator.SetBool("Walk", isWalking);
         animator.SetBool("Run", isRunning);
-        Ray ray = camera.ScreenPointToRay(Input.mousePosition);
-        Debug.DrawRay(ray.origin, ray.direction * pickUpDistance, Color.red);
-        if (Input.GetMouseButtonDown(0))
-        {
 
-            RaycastHit hit;
-
-            if (Physics.Raycast(ray, out hit, pickUpDistance))
-            {
-
-                Debug.Log(hit.collider.gameObject.name);
-                Interactable interactable = hit.collider.GetComponent<Interactable>();
-
-                if (interactable != null)
-                {
-                    if (interactable.pickedUp == false)
-                    {
-                        InventoryManager.Instance.addItem(interactable);
-                        interactable.gameObject.SetActive(false);
-                    }
-                    interactable.pickedUp = true;
-                    Debug.Log("Interact");
-                }
-
-            }
-        }
     }
 
 

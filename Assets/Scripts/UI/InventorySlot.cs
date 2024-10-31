@@ -6,14 +6,16 @@ using UnityEngine.UI;
 public class InventorySlot : MonoBehaviour
 {
     // Start is called before the first frame update
-    Image icon;
+    [SerializeField]
+    private Image icon;
+
     Interactable item;
     [SerializeField]
     private Button closeButton;
 
     void Start()
     {
-        icon = GetComponentInChildren<Image>();
+        // icon = GetComponentInChildren<Image>();
     }
 
     // Update is called once per frame
@@ -30,5 +32,23 @@ public class InventorySlot : MonoBehaviour
             icon.sprite = newItem.icon;
             closeButton.interactable = true;
         }
+    }
+    public void RemoveItem()
+    {
+        InventoryManager.Instance.removeItem(item);
+        item = null;
+        icon.enabled = false;
+        icon.sprite = null;
+        closeButton.interactable = false;
+        // InventoryUI.
+    }
+    public void useItem()
+    {
+        Debug.Log("Using item" + item.name);
+        GameObject newObject = item.gameObject;
+        InventoryManager.Instance.itemToUse = newObject;
+        RemoveItem();
+        // newObject.SetActive(true);
+
     }
 }

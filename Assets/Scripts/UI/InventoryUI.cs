@@ -7,6 +7,8 @@ public class InventoryUI : MonoBehaviour
     public Transform itemsParent;
     InventoryManager inventoryManager;
     public InventorySlot[] inventorySlots;
+    [SerializeField]
+    private Interactable pickedItem;
     // Start is called before the first frame update
     void Start()
     {
@@ -27,4 +29,5 @@ public class InventoryUI : MonoBehaviour
             // // else inventorySlots[i].
         }
     }
+
 }

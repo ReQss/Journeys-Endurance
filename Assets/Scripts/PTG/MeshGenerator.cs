@@ -17,17 +17,24 @@ public class MeshGenerator
         MeshData meshData = new MeshData(verticesPerLine, verticesPerLine);
         int vertexIndex = 0;
 
+        // Define flat area size and position (e.g., a square in the center)
+        int flatAreaSize = width / 16;  // Adjust as needed
+        int flatAreaStartX = (width - flatAreaSize) / 2;
+        int flatAreaStartZ = (height - flatAreaSize) / 2;
+
         for (int i = 0; i < height; i += meshSimplificationIncrement)
         {
             for (int j = 0; j < width; j += meshSimplificationIncrement)
             {
-                float heightValue = heightCurve.Evaluate(heightMap[j, i]) * heightMultiplier;
+                // Check if the vertex is within the flat area
+                bool isWithinFlatArea = j >= flatAreaStartX && j <= flatAreaStartX + flatAreaSize &&
+                                        i >= flatAreaStartZ && i <= flatAreaStartZ + flatAreaSize;
+
+                // Set height to zero if within the flat area, otherwise use the height curve
+                float heightValue = isWithinFlatArea ? 1f : heightCurve.Evaluate(heightMap[j, i]) * heightMultiplier;
+
                 meshData.vertices[vertexIndex] = new Vector3(topLeftX + j, heightValue, topLeftZ - i);
                 meshData.uvs[vertexIndex] = new Vector2(j / (float)width, i / (float)height);
-
-                // Assign a color to the vertex based on the height
-                float normalizedHeight = Mathf.InverseLerp(0, heightMultiplier, heightValue);
-                meshData.colors[vertexIndex] = gradient.Evaluate(normalizedHeight);
 
                 if (j < width - 1 && i < height - 1)
                 {
@@ -39,6 +46,7 @@ public class MeshGenerator
         }
         return meshData;
     }
+
 
 }
 public class MeshData
