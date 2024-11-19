@@ -1,4 +1,5 @@
 
+using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -15,18 +16,31 @@ public class EnemyAI : MonoBehaviour
     public float delayAttackTime;
     private bool isAttacking;
     public Animator animator;
-    public int health;
+    public int health = 3;
     public float movementSpeed;
+    private bool isTakingDamage = false;
+    public float invincibleDelayTime = 0.05f;
+    [SerializeField]
+    private GameObject healthBar;
+    private void Start()
+    {
+        healthBar.GetComponent<HealthBar>().SetMaxHealth(health);
+    }
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
         player = GameObject.Find("Player").transform;
         animator = GetComponent<Animator>();
+
     }
     private void Update()
     {
         playerInSightRange = Physics.CheckSphere(transform.position, sightRange, playerMask);
         playerInAttackRange = Physics.CheckSphere(transform.position, attackRange, playerMask);
+        if (GameManager.Instance.huntingTime)
+        {
+            sightRange = 1000;
+        }
         if (!playerInSightRange && !playerInAttackRange && !isAttacking)
         {
             Patrolling();
@@ -46,8 +60,17 @@ public class EnemyAI : MonoBehaviour
             animator.SetBool("isAttacking", true);
         }
     }
+    private IEnumerator resetPoint()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(5);
+            isWalking = false;
+        }
+    }
     private void Patrolling()
     {
+        StartCoroutine(resetPoint());
         if (!isWalking)
         {
             walkPoint = LookForWalkPoint();
@@ -57,7 +80,8 @@ public class EnemyAI : MonoBehaviour
         else agent.SetDestination(walkPoint);
 
         Vector3 distanceToWalkPoint = transform.position - walkPoint;
-        if (distanceToWalkPoint.magnitude < 1f)
+        // Debug.Log(distanceToWalkPoint);
+        if (distanceToWalkPoint.magnitude < 1.5f)
         {
             isWalking = false;
         }
@@ -72,6 +96,7 @@ public class EnemyAI : MonoBehaviour
         {
             return walkPointTemp;
         }
+
         return Vector3.zero;
     }
     private void Chasing()
@@ -82,7 +107,6 @@ public class EnemyAI : MonoBehaviour
     private void Attacking()
     {
         agent.SetDestination(transform.position);
-        // transform.LookAt(player);
         if (!isAttacking)
         {
             isAttacking = true;
@@ -93,12 +117,25 @@ public class EnemyAI : MonoBehaviour
     {
         isAttacking = false;
     }
-    private void TakeDamage(int damage)
+    IEnumerator TakeDamage(int damage)
     {
+        isTakingDamage = true;
         health -= damage;
+        healthBar.GetComponent<HealthBar>().TakeDamage();
         if (health <= 0)
         {
             Invoke(nameof(DestroyEnemy), .5f);
+        }
+        yield return new WaitForSeconds(invincibleDelayTime);
+        isTakingDamage = false;
+
+    }
+    private void OnCollisionEnter(Collision other)
+    {
+        if (other.gameObject.CompareTag("Bullet") && !isTakingDamage)
+        {
+
+            StartCoroutine(TakeDamage(1));
         }
     }
     private void DestroyEnemy()

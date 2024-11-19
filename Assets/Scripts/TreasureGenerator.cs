@@ -37,9 +37,12 @@ public class TreasureGenerator : ObjectGenerator
                 GameObject randomPrefab = getRandomObject();
                 GameObject spawnedObject = Instantiate(randomPrefab, hit.point, Quaternion.identity);
                 spawnedObject.transform.SetParent(instantiatedObjectsFolder.transform);
-                Vector3 signalPosition = hit.point;
-                signalPosition += new Vector3(2, 2, 0);
-                GameObject signal = Instantiate(signalSmokePrefab, signalPosition, Quaternion.identity);
+                if (signalSmokePrefab != null)
+                {
+                    Vector3 signalPosition = hit.point;
+                    signalPosition += new Vector3(2, 2, 0);
+                    GameObject signal = Instantiate(signalSmokePrefab, signalPosition, Quaternion.identity);
+                }
                 positionFound = true;
             }
 

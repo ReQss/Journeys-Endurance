@@ -108,7 +108,7 @@ public class GrassGenerator : MonoBehaviour
                     }
                     position.y += adjustGrassHeight;
 
-                    float randomScaleFactor = Random.Range(0.8f, 1.5f);
+                    float randomScaleFactor = Random.Range(0.8f, 1.2f);
                     Quaternion rotation = Quaternion.FromToRotation(Vector3.up, hit.normal);
 
 

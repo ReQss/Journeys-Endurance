@@ -218,7 +218,7 @@ MonoBehaviour:
   enemyDetectionRadius: 30
   enemyLayer:
     serializedVersion: 2
-    m_Bits: 384
+    m_Bits: 256
   tower: {fileID: 0}
   bulletSpeed: 70
   attackDelay: 4

@@ -1,6 +1,4 @@
 using System.Collections;
-
-
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Security.Cryptography;
@@ -17,12 +15,16 @@ public class ThirdPersonMovement : MonoBehaviour
     public Camera cinemachineCamera;
     Camera camera;
 
+
     public float speed = 6;
-    private float runSpeed = 1.5f;
+    public float runSpeed = 1.5f;
     public float gravity = -9.81f;
     public float jumpHeight = 3;
+    public AnimationCurve jumpCurve; // Add this curve for jump
+    private float jumpTime; // Track time for jump curve
+    private bool isJumping = false;
     Vector3 velocity;
-    bool isGrounded;
+    public bool isGrounded;
 
     public Transform groundCheck;
     public float groundDistance = 0.4f;
@@ -32,22 +34,33 @@ public class ThirdPersonMovement : MonoBehaviour
     public float turnSmoothTime = 0.1f;
     public static bool cursorLocked = true;
     public float pickUpDistance = 80f;
+    private float playerVelocity = 0.0f;
+    public float acceleration = 0.1f;
+    public float decceleration = 0.5f;
+    int velocityHash;
 
-    /// <summary>
-    /// Start is called on the frame when a script is enabled just before
-    /// any of the Update methods is called the first time.
-    /// </summary>
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
         camera = Camera.main;
-        // animator = GetComponent<Animator>();
+        velocityHash = Animator.StringToHash("Velocity");
     }
-    // Update is called once per frame
+
     void Update()
     {
-
-        if (Input.GetKeyDown(KeyCode.LeftControl))
+        if (GameManager.Instance.isPlayerInteracting == true)
+        {
+            animator.SetFloat("Velocity", 0);
+            foreach (AnimatorControllerParameter parameter in animator.parameters)
+            {
+                if (parameter.type == AnimatorControllerParameterType.Bool)
+                {
+                    animator.SetBool(parameter.name, false);
+                }
+            }
+            return;
+        }
+        if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl))
         {
             if (cursorLocked)
             {
@@ -61,58 +74,61 @@ public class ThirdPersonMovement : MonoBehaviour
             }
             cursorLocked = !cursorLocked;
         }
-        bool isWalking = animator.GetBool("Walk");
-        bool isRunning = animator.GetBool("Run");
+
         bool runPressed = Input.GetKey("right shift");
-        //jump
+
         isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
 
-        if (isGrounded && velocity.y < 0)
+        if (isGrounded && !isJumping)
         {
             velocity.y = -2f;
+            animator.SetBool("Jump", false);
         }
 
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
-            velocity.y = Mathf.Sqrt(jumpHeight * -2 * gravity);
+            jumpTime = 0f;
+            isJumping = true;
+            animator.SetBool("Jump", true);
         }
-        //gravity
-        velocity.y += gravity * Time.deltaTime;
+
+        if (isJumping)
+        {
+            jumpTime += Time.deltaTime;
+            velocity.y = jumpCurve.Evaluate(jumpTime) * jumpHeight;
+
+            if (jumpTime >= jumpCurve.keys[jumpCurve.length - 1].time)
+            {
+                isJumping = false;
+                velocity.y = -2f;
+            }
+        }
+        else
+        {
+            velocity.y += gravity * Time.deltaTime;
+        }
         controller.Move(velocity * Time.deltaTime);
-        //walk
+
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
         Vector3 direction = new Vector3(horizontal, 0f, vertical).normalized;
 
-        if (direction.magnitude >= 0.1f && cursorLocked == true)
+        if (direction.magnitude >= 0.1f && cursorLocked)
         {
             float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + cam.eulerAngles.y;
             float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
             transform.rotation = Quaternion.Euler(0f, angle, 0f);
 
             Vector3 moveDir = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
-            if (runPressed)
-            {
-                isRunning = true;
-                isWalking = false;
-                controller.Move(moveDir.normalized * speed * runSpeed * Time.deltaTime);
-            }
-            else
-            {
-                controller.Move(moveDir.normalized * speed * Time.deltaTime);
-                isRunning = false;
-                isWalking = true;
-            }
+            playerVelocity = Mathf.Clamp(playerVelocity + Time.deltaTime * acceleration, 0f, 1f);
+            float moveSpeed = speed * (runPressed ? runSpeed : 1f);
+            controller.Move(moveDir.normalized * moveSpeed * Time.deltaTime * playerVelocity * 3f);
         }
-        else
+        else if (playerVelocity > 0)
         {
-            isRunning = false;
-            isWalking = false;
+            playerVelocity = Mathf.Clamp(playerVelocity - Time.deltaTime * decceleration, 0f, 1f);
         }
-        animator.SetBool("Walk", isWalking);
-        animator.SetBool("Run", isRunning);
 
+        animator.SetFloat(velocityHash, playerVelocity);
     }
-
-
 }
