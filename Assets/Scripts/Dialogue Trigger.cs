@@ -6,11 +6,21 @@ public class DialogueTrigger : MonoBehaviour
 {
     // Start is called before the first frame update
     public Dialogue dialogue;
-    public Transform player;
+    public string sceneName = null;
+    public bool isSpecialAction;
+    private Transform player;
     public float detectionRadius = 5f;
+    /// <summary>
+    /// Start is called on the frame when a script is enabled just before
+    /// any of the Update methods is called the first time.
+    /// </summary>
+    void Start()
+    {
+        player = GameObject.Find("Player").transform;
+    }
     public void TriggerDialogue()
     {
-        FindObjectOfType<DialogueManager>().StartDialogue(dialogue);
+        FindObjectOfType<DialogueManager>().StartDialogue(dialogue, sceneName, isSpecialAction);
     }
     private void Update()
     {

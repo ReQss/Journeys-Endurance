@@ -5,6 +5,7 @@ using UnityEngine.AI;
 
 public class EnemyAI : MonoBehaviour
 {
+    public AudioSource walkingSound, runningSound, attackingSound;
     public NavMeshAgent agent;
     public Transform player;
     public LayerMask groundMask, playerMask;
@@ -22,6 +23,8 @@ public class EnemyAI : MonoBehaviour
     public float invincibleDelayTime = 0.05f;
     [SerializeField]
     private GameObject healthBar;
+    public LayerMask playerLayer;
+
     private void Start()
     {
         healthBar.GetComponent<HealthBar>().SetMaxHealth(health);
@@ -58,7 +61,25 @@ public class EnemyAI : MonoBehaviour
         {
             Attacking();
             animator.SetBool("isAttacking", true);
+            StartCoroutine(CheckForDamage());
         }
+    }
+    private IEnumerator CheckForDamage()
+    {
+        yield return new WaitForSeconds(.5f);
+        Collider[] hitColliders = Physics.OverlapSphere(transform.position, 1.8f, playerLayer);
+        foreach (var collider in hitColliders)
+        {
+            if (collider.CompareTag("Player") && GameManager.Instance.isInvincible == false)
+            {
+                Debug.Log("Hit player");
+                player.GetComponent<ThirdPersonMovement>().TakeDamage();
+                GameManager.Instance.isInvincible = true;
+                yield return new WaitForSeconds(1f);
+                GameManager.Instance.isInvincible = false;
+            }
+        }
+
     }
     private IEnumerator resetPoint()
     {
@@ -70,6 +91,9 @@ public class EnemyAI : MonoBehaviour
     }
     private void Patrolling()
     {
+        walkingSound.enabled = true;
+        runningSound.enabled = false;
+        attackingSound.enabled = false;
         StartCoroutine(resetPoint());
         if (!isWalking)
         {
@@ -101,11 +125,17 @@ public class EnemyAI : MonoBehaviour
     }
     private void Chasing()
     {
+        walkingSound.enabled = false;
+        runningSound.enabled = true;
+        attackingSound.enabled = false;
         agent.SetDestination(player.position);
         agent.speed = 8;
     }
     private void Attacking()
     {
+        walkingSound.enabled = false;
+        runningSound.enabled = false;
+        attackingSound.enabled = true;
         agent.SetDestination(transform.position);
         if (!isAttacking)
         {

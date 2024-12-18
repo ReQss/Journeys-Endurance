@@ -5,6 +5,7 @@ using UnityEngine;
 public class TreasureGenerator : ObjectGenerator
 {
     public GameObject signalSmokePrefab;
+    public float adjustYPos = 0f;
 
     public override void Generate()
     {
@@ -35,7 +36,7 @@ public class TreasureGenerator : ObjectGenerator
                 Ray objectRay = new Ray(randomPosition, Vector3.down);
                 Debug.DrawRay(randomPosition, Vector3.down * hit.distance, Color.red);
                 GameObject randomPrefab = getRandomObject();
-                GameObject spawnedObject = Instantiate(randomPrefab, hit.point, Quaternion.identity);
+                GameObject spawnedObject = Instantiate(randomPrefab, new Vector3(hit.point.x, hit.point.y + adjustYPos, hit.point.z), Quaternion.identity);
                 spawnedObject.transform.SetParent(instantiatedObjectsFolder.transform);
                 if (signalSmokePrefab != null)
                 {

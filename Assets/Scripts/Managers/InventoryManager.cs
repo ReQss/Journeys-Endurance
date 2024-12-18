@@ -1,15 +1,23 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+[System.Serializable]
 
 public class InventoryManager : MonoBehaviour
 {
+    public int currentDayNum = 0;
     // Start is called before the first frame update
-    private static InventoryManager _instance;
+    [SerializeField]
+    public List<Item> gameItems;
+    public static InventoryManager _instance;
     public int itemsCount = 0;
     public GameObject itemToUse = null;
     public float pickUpDistance = 80f;
+    public int questItemNumber = 0;
+    public bool isInventoryLoaded = false;
 
+    public TextMeshProUGUI currentDay;
     public static InventoryManager Instance
     {
         get
@@ -22,22 +30,92 @@ public class InventoryManager : MonoBehaviour
             return _instance;
         }
     }
-    public List<Interactable> items = new List<Interactable>();
-    void Start()
-    {
 
-    }
+    public List<Item> items = new List<Item>();
+    public List<string> listOfItemNames = new List<string>();
     private void Awake()
     {
-        _instance = this;
+        if (_instance == null)
+        {
+            _instance = this;
+            if (transform.parent != null)
+            {
+                transform.SetParent(null);
+            }
+            DontDestroyOnLoad(gameObject);
+        }
+
+    }
+    /// <summary>
+    /// Start is called on the frame when a script is enabled just before
+    /// any of the Update methods is called the first time.
+    /// </summary>
+    void Start()
+    {
+        isInventoryLoaded = false;
+        LoadGameItemsPrefabs();
+        LoadItems();
+    }
+    public void SaveItemNames()
+    {
+        listOfItemNames.Clear();
+        foreach (Item item in items)
+        {
+            listOfItemNames.Add(item.itemName);
+        }
+    }
+    public void LoadGameItemsPrefabs()
+    {
+        Debug.Log("Loading inventory games");
+        gameItems.Clear();
+        GameObject parentObject = GameObject.Find("GameItemPrefabs");
+        if (parentObject != null)
+        {
+            foreach (Transform child in parentObject.transform)
+            {
+                // Debug.Log($"Child Name: {child.gameObject.name}");
+                gameItems.Add(child.GetComponent<Item>());
+            }
+        }
+        else
+        {
+            Debug.LogWarning("Parent GameObject not found in the scene.");
+        }
+    }
+    public void LoadItems()
+    {
+        items.Clear();
+        foreach (string itemName in listOfItemNames)
+        {
+            foreach (Item game_item in gameItems)
+            {
+                // Debug.Log(game_item.itemName + " + " + itemName);
+                if (game_item.itemName.Equals(itemName))
+                {
+                    items.Add(game_item);
+                }
+            }
+        }
     }
     void Update()
     {
+        questItemNumber = countQuestItems();
+        if (questItemNumber >= GameManager.Instance.questItemsRequired)
+        {
+            Debug.Log("End game");
+        }
+        if (Input.GetKeyDown(KeyCode.W) && isInventoryLoaded == false)
+        {
+            LoadGameItemsPrefabs();
+            LoadItems();
+            isInventoryLoaded = true;
+        }
         // pick item
         if (Input.GetMouseButtonDown(0))
         {
 
             pickUp();
+            SaveItemNames();
         }
         if (itemToUse && ThirdPersonMovement.cursorLocked == false)
         {
@@ -45,6 +123,13 @@ public class InventoryManager : MonoBehaviour
             {
                 placeObject();
             }
+        }
+        if (GameManager.Instance.questItemsRequired <= questItemNumber)
+        {
+            TextMeshProUGUI text = GameObject.Find("CurrentDay").GetComponent<TextMeshProUGUI>();
+            currentDay = text;
+            currentDay.text = "You have all the items";
+            GameManager.Instance.isQuestAchieved = true;
         }
     }
     private void placeObject()
@@ -56,8 +141,13 @@ public class InventoryManager : MonoBehaviour
         if (Physics.Raycast(ray, out hit, 20))
         {
             GameObject newGameObject = Instantiate(itemToUse, hit.point, Quaternion.identity);
+            if (newGameObject.GetComponent<Item>().itemType == itemType.QUEST)
+            {
+                // newGameObject.transform.eulerAngles = new Vector3(90f, 0f, 0f);
+                newGameObject.transform.position = new Vector3(hit.point.x, hit.point.y + 1.5f, hit.point.z);
+            }
             newGameObject.SetActive(true);
-            newGameObject.GetComponent<Interactable>().pickedUp = false;
+            newGameObject.GetComponent<Item>().pickedUp = false;
             itemToUse = null;
         }
     }
@@ -69,8 +159,8 @@ public class InventoryManager : MonoBehaviour
         if (Physics.Raycast(ray, out hit, pickUpDistance))
         {
 
-            Debug.Log(hit.collider.gameObject.name);
-            Interactable interactable = hit.collider.GetComponent<Interactable>();
+            // Debug.Log(hit.collider.gameObject.name);
+            Item interactable = hit.collider.GetComponent<Item>();
 
             if (interactable != null)
             {
@@ -79,6 +169,7 @@ public class InventoryManager : MonoBehaviour
                     InventoryManager.Instance.addItem(interactable);
                     interactable.gameObject.SetActive(false);
                     interactable.pickedUp = true;
+
                 }
 
                 Debug.Log("Interact");
@@ -86,13 +177,26 @@ public class InventoryManager : MonoBehaviour
 
         }
     }
-    public void addItem(Interactable item)
+    private int countQuestItems()
     {
-        Interactable newItem = item;
+        int i = 0;
+        foreach (Item item in items)
+        {
+            if (item.itemType == itemType.QUEST)
+            {
+                i++;
+            }
+        }
+        return i;
+    }
+    public void addItem(Item item)
+    {
+        Item newItem = item;
         items.Add(newItem);
         itemsCount++;
+
     }
-    public void removeItem(Interactable item)
+    public void removeItem(Item item)
     {
         itemsCount--;
         items.Remove(item);

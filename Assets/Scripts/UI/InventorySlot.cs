@@ -9,7 +9,7 @@ public class InventorySlot : MonoBehaviour
     [SerializeField]
     private Image icon;
 
-    Interactable item;
+    Item item;
     [SerializeField]
     private Button closeButton;
 
@@ -23,7 +23,7 @@ public class InventorySlot : MonoBehaviour
     {
 
     }
-    public void AddItem(Interactable newItem)
+    public void AddItem(Item newItem)
     {
         if (newItem != null)
         {
@@ -41,6 +41,14 @@ public class InventorySlot : MonoBehaviour
         icon.sprite = null;
         closeButton.interactable = false;
         // InventoryUI.
+    }
+    public void SetItemNull()
+    {
+        item = null;
+        icon.enabled = false;
+        icon.sprite = null;
+        closeButton.interactable = false;
+        icon.color = Color.white;
     }
     public void useItem()
     {

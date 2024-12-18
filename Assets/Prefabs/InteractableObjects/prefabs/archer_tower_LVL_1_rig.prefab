@@ -41,15 +41,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 334b8d6f9e3c8ba49a200eafbee0c5fe, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.5
+      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 334b8d6f9e3c8ba49a200eafbee0c5fe, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.5
+      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 334b8d6f9e3c8ba49a200eafbee0c5fe, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.5
+      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 334b8d6f9e3c8ba49a200eafbee0c5fe, type: 3}
       propertyPath: m_LocalPosition.x
@@ -145,7 +145,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemName: archer tower
-  radius: 3
+  radius: 7
   isNearbyPlayer: 0
   player: {fileID: 0}
   playerMask:
@@ -153,6 +153,7 @@ MonoBehaviour:
     m_Bits: 0
   pickedUp: 0
   icon: {fileID: 21300000, guid: 8ad5ab5765d3273458fbaa4d93424ec8, type: 3}
+  isSpecialItem: 0
 --- !u!65 &3870542207457824513
 BoxCollider:
   m_ObjectHideFlags: 0

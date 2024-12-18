@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using TMPro;
+using Unity.VisualScripting;
 
 public class Timer : MonoBehaviour, IPointerClickHandler
 {
@@ -25,11 +26,18 @@ public class Timer : MonoBehaviour, IPointerClickHandler
     private int remainingDuration;
 
     private bool pause;
+    public TextMeshProUGUI currentDay;
+    public Animator lightAnimator;
 
     private void Start()
     {
+        if (InventoryManager.Instance.currentDayNum != 0)
+        {
+            currentDay.text = "Day " + InventoryManager.Instance.currentDayNum.ToString();
+        }
+        else currentDay.text = "Day " + GameManager.Instance.currentDay.ToString();
 
-        duration = GameManager.Instance.chaseTimer;
+        duration = GameManager.Instance.dayTimer;
         Being(duration);
     }
 
@@ -52,16 +60,71 @@ public class Timer : MonoBehaviour, IPointerClickHandler
             }
             yield return null;
         }
-        OnEnd();
+        if (GameManager.Instance.isDay)
+            SetNightTime();
+        else SetDayTime();
+    }
+    public void SetDayTime()
+    {
+        //gowno
+
+        if (GameManager.Instance.currentDay > 7) return;
+        GameManager.Instance.DestroyEnemies();
+        switch (GameManager.Instance.difficultyLevel)
+        {
+            case 1:
+                GameManager.Instance.GenerateEnemiesLevel1();
+                Debug.Log("Gen level1");
+                break;
+            case 2:
+                GameManager.Instance.GenerateEnemiesLevel2();
+                Debug.Log("Gen level2");
+                break;
+            case 3:
+                GameManager.Instance.GenerateEnemiesLevel3();
+                Debug.Log("Gen level3");
+                break;
+            default:
+                Debug.Log("level difficulty not found");
+                break;
+        }
+        GameManager.Instance.huntingTime = false;
+        GameManager.Instance.currentDay++;
+        InventoryManager.Instance.currentDayNum = GameManager.Instance.currentDay;
+        currentDay.text = "Day " + GameManager.Instance.currentDay.ToString();
+
+
+        if (GameManager.Instance.currentDay <= 2)
+        {
+            GameManager.Instance.difficultyLevel = 1;
+        }
+        else if (GameManager.Instance.currentDay <= 5)
+        {
+            GameManager.Instance.difficultyLevel = 2;
+        }
+        else
+        {
+            GameManager.Instance.difficultyLevel = 3;
+        }
+        GameManager.Instance.isDay = true;
+        Being(duration);
+        lightAnimator.SetBool("isDay", false);
+        RenderSettings.fog = false;
+        // RenderSettings.skybox = RenderSettings.skybox;
+
+    }
+    private void SetNightTime()
+    {
+        GameManager.Instance.isDay = false;
+        GameManager.Instance.huntingTime = true;
+        // dayLight.SetActive(false);
+        // nightLight.SetActive(true);
+        lightAnimator.SetBool("isDay", true);
+        RenderSettings.fog = true;
+        // RenderSettings.skybox = null;
+        Being(GameManager.Instance.nightTimer);
+        // print("End");
     }
 
-    private void OnEnd()
-    {
-        GameManager.Instance.huntingTime = true;
-        dayLight.SetActive(false);
-        nightLight.SetActive(true);
-        RenderSettings.fog = true;
-        RenderSettings.skybox = null;
-        print("End");
-    }
+
 }

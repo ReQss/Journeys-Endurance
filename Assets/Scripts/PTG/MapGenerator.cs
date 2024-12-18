@@ -3,6 +3,7 @@ using UnityEngine;
 using System;
 using System.Threading;
 using System.Collections.Generic;
+using Unity.AI.Navigation;
 
 
 public class MapGenerator : MonoBehaviour
@@ -28,6 +29,9 @@ public class MapGenerator : MonoBehaviour
     public bool useFalloff;
     public bool autoUpdate;
     float[,] falloffMap;
+    GameObject mesh;
+
+
     public void DrawMesh(MeshData meshData, Texture2D texture2D)
     {
         meshFilter.sharedMesh = meshData.CreateMesh();
@@ -39,8 +43,30 @@ public class MapGenerator : MonoBehaviour
 
     void Awake()
     {
-        // falloffMap = FalloffGenerator.GenerateFalloffMap(mapChunkSize);
+        seed = UnityEngine.Random.Range(0, 1000);
+        falloffMap = FalloffGenerator.GenerateFalloffMap(mapChunkSize);
+        MapData mapData = GenerateMapData(Vector2.zero);
+        MeshData meshData = MeshGenerator.GenerateTerrainMesh(
+            mapData.heightMap,
+            meshHighMultiplier,
+            meshHeightCurve,
+            editorPreviewLOD,
+            gradient
+        );
+        DrawMesh(meshData);
+        mesh = GameObject.Find("Terrain");
+
+        mesh.AddComponent<MeshCollider>();
+        NavMeshSurface navMeshSurface = GameObject.Find("NavMesh").GetComponent<NavMeshSurface>();
+        if (navMeshSurface != null)
+            navMeshSurface.BuildNavMesh();
     }
+    void Start()
+    {
+        // Generowanie i rysowanie mapy przy uruchomieniu gry
+
+    }
+
     public void DrawMesh(MeshData meshData)
     {
         meshFilter.sharedMesh = meshData.CreateMesh();

@@ -17,11 +17,11 @@ public class ObjectGenerator : MonoBehaviour
     public bool positionClear = true;
     public int numberOfObjects = 0;
     public GameObject instantiatedObjectsFolder;
-
+    public bool spawnObjects = true;
 
     void Start()
     {
-
+        if (spawnObjects == false) return;
         for (int i = 0; i < numberOfObjects; i++)
         {
             Generate();

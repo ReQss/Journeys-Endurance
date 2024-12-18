@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 public class HealthBar : MonoBehaviour
 {
@@ -46,6 +47,17 @@ public class HealthBar : MonoBehaviour
     public void TakeDamage()
     {
         this.health -= 1;
+        SetHealth(this.health);
+        if (GameManager.Instance.playerHealth <= 0)
+        {
+            SceneManager.LoadScene("Menu");
+            Cursor.lockState = CursorLockMode.None;
+        }
+    }
+    public void AddHealth()
+    {
+        if (this.health >= maxHealth) return;
+        this.health += 1;
         SetHealth(this.health);
     }
 

@@ -3,16 +3,27 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Interactable : MonoBehaviour
+public enum itemType
+{
+    COMMON,
+    UNCOMMON,
+    RARE,
+    EPIC,
+    QUEST
+}
+[System.Serializable]
+public class Item : MonoBehaviour
 {
     [SerializeField]
-    private string itemName;
+    public string itemName;
     public float radius = 3f;
     public bool isNearbyPlayer = false;
     public Transform player;
     public LayerMask playerMask;
     public bool pickedUp = false;
     public Sprite icon;
+    // public bool isSpecialItem = false;
+    public itemType itemType;
 
 
     private void Start()

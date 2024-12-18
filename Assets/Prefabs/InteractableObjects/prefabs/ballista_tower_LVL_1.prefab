@@ -171,7 +171,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemName: balista tower
-  radius: 5
+  radius: 7
   isNearbyPlayer: 0
   player: {fileID: 0}
   playerMask:
@@ -179,6 +179,7 @@ MonoBehaviour:
     m_Bits: 0
   pickedUp: 0
   icon: {fileID: 21300000, guid: 8ad5ab5765d3273458fbaa4d93424ec8, type: 3}
+  isSpecialItem: 0
 --- !u!65 &1309939652972954242
 BoxCollider:
   m_ObjectHideFlags: 0
