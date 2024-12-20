@@ -9,6 +9,9 @@ using UnityEngine;
 public class ThirdPersonMovement : MonoBehaviour
 {
     public AudioSource footstepsSound;
+    public AudioSource healingSound;
+
+    public GameObject healingUI;
     public Item focus;
     public Animator animator;
     public CharacterController controller;
@@ -36,7 +39,6 @@ public class ThirdPersonMovement : MonoBehaviour
 
     float turnSmoothVelocity;
     public float turnSmoothTime = 0.1f;
-    public static bool cursorLocked = true;
     public float pickUpDistance = 80f;
     private float playerVelocity = 0.0f;
     public float acceleration = 0.1f;
@@ -57,6 +59,44 @@ public class ThirdPersonMovement : MonoBehaviour
 
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl))
+        {
+            // Debug.Log(cursorLocked);
+
+            GameManager.cursorLocked = !GameManager.cursorLocked;
+        }
+        if (!GameManager.cursorLocked)
+        {
+            Cursor.lockState = CursorLockMode.None;
+            camera.GetComponent<CinemachineBrain>().enabled = false;
+        }
+        else
+        {
+            camera.GetComponent<CinemachineBrain>().enabled = true;
+            Cursor.lockState = CursorLockMode.Locked;
+        }
+
+        if (GameManager.Instance.isPlayerInteracting == true)
+        {
+            animator.SetFloat("Velocity", 0);
+            foreach (AnimatorControllerParameter parameter in animator.parameters)
+            {
+                if (parameter.type == AnimatorControllerParameterType.Bool)
+                {
+                    animator.SetBool(parameter.name, false);
+                }
+            }
+            return;
+        }
+
+        BirdMovement();
+        Movement();
+        HealingAndDamage();
+    }
+    public void BirdMovement()
+    {
+        if (birdRigidbody == null) return;
+
         if (Input.GetKeyDown(KeyCode.O))
         {
             birdMode = !birdMode;
@@ -74,32 +114,9 @@ public class ThirdPersonMovement : MonoBehaviour
             playerCamera.SetActive(true);
             birdCamera.SetActive(false);
         }
-        if (GameManager.Instance.isPlayerInteracting == true)
-        {
-            animator.SetFloat("Velocity", 0);
-            foreach (AnimatorControllerParameter parameter in animator.parameters)
-            {
-                if (parameter.type == AnimatorControllerParameterType.Bool)
-                {
-                    animator.SetBool(parameter.name, false);
-                }
-            }
-            return;
-        }
-        if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl))
-        {
-            if (cursorLocked)
-            {
-                Cursor.lockState = CursorLockMode.None;
-                camera.GetComponent<CinemachineBrain>().enabled = false;
-            }
-            else
-            {
-                camera.GetComponent<CinemachineBrain>().enabled = true;
-                Cursor.lockState = CursorLockMode.Locked;
-            }
-            cursorLocked = !cursorLocked;
-        }
+    }
+    public void Movement()
+    {
 
         bool runPressed = Input.GetKey("right shift");
         inBase = Physics.CheckSphere(groundCheck.position, 5f, baseLayer);
@@ -139,7 +156,7 @@ public class ThirdPersonMovement : MonoBehaviour
         float vertical = Input.GetAxisRaw("Vertical");
         Vector3 direction = new Vector3(horizontal, 0f, vertical).normalized;
 
-        if (direction.magnitude >= 0.1f && cursorLocked)
+        if (direction.magnitude >= 0.1f && GameManager.cursorLocked)
         {
             float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + cam.eulerAngles.y;
             float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
@@ -158,6 +175,9 @@ public class ThirdPersonMovement : MonoBehaviour
         }
 
         animator.SetFloat(velocityHash, playerVelocity);
+    }
+    public void HealingAndDamage()
+    {
         //   NIGHT TIME DAMAGE
         if (!inBase && GameManager.Instance.isDay == false && isTakingDamage == false)
         {
@@ -166,7 +186,14 @@ public class ThirdPersonMovement : MonoBehaviour
         // IN BASE HEAL 
         if (inBase)
         {
+            healingSound.enabled = true;
             StartCoroutine(BaseHeal());
+            healingUI.SetActive(true);
+        }
+        else
+        {
+            healingSound.enabled = false;
+            healingUI.SetActive(false);
         }
     }
     public void TakeDamage()
@@ -185,7 +212,7 @@ public class ThirdPersonMovement : MonoBehaviour
         isTakingDamage = true;
         Debug.Log("Player damaged ");
         TakeDamage();
-        yield return new WaitForSeconds(10f);
+        yield return new WaitForSeconds(GameManager.Instance.timeForNightDamage);
         isTakingDamage = false;
 
     }
@@ -196,7 +223,7 @@ public class ThirdPersonMovement : MonoBehaviour
             isHealed = true;
             Debug.Log("Player healed");
             HealPlayer();
-            yield return new WaitForSeconds(10f);
+            yield return new WaitForSeconds(GameManager.Instance.timeForNightDamage);
             isHealed = false;
         }
     }

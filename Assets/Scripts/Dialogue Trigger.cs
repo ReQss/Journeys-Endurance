@@ -27,6 +27,7 @@ public class DialogueTrigger : MonoBehaviour
         float distance = Vector3.Distance(transform.position, player.position);
         if (distance <= detectionRadius && Input.GetKeyDown(KeyCode.E))
         {
+            GameManager.cursorLocked = false;
             TriggerDialogue();
         }
     }

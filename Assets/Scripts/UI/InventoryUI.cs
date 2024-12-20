@@ -28,6 +28,7 @@ public class InventoryUI : MonoBehaviour
         {
             if (i < InventoryManager.Instance.itemsCount)
             {
+                Debug.Log(i);
                 inventorySlots[i].AddItem(inventoryManager.items[i]);
                 GameObject childObject = inventorySlots[i].transform.GetChild(0).gameObject;
                 CheckItemType(childObject, inventoryManager.items[i]);

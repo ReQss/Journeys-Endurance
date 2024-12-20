@@ -7,11 +7,15 @@ public class BirdFlyingMovement : MonoBehaviour
 {
     [Header("Flying Settings")]
     public float flySpeed = 6.0f;
+
     public float ascendSpeed = 4.0f;
     public float descendSpeed = 4.0f;
     public float gravity = -9.81f;
     public float turnSmoothTime = 0.1f;
     private float turnSmoothVelocity;
+    [Header("Height Settings")]
+    public float minHeight = 5.0f;
+
 
     private CharacterController controller;
     private Vector3 velocity;
@@ -61,6 +65,14 @@ public class BirdFlyingMovement : MonoBehaviour
         if (!Input.GetKey(KeyCode.Space) && !Input.GetKey(KeyCode.LeftControl))
         {
             velocity.y += gravity * Time.deltaTime;
+        }
+
+        if (transform.position.y <= minHeight)
+        {
+            velocity.y = Mathf.Max(velocity.y, 0);
+            Vector3 correctedPosition = transform.position;
+            correctedPosition.y = minHeight;
+            transform.position = correctedPosition;
         }
     }
 

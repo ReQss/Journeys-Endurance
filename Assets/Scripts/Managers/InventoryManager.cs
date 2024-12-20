@@ -18,6 +18,7 @@ public class InventoryManager : MonoBehaviour
     public bool isInventoryLoaded = false;
 
     public TextMeshProUGUI currentDay;
+    public TextMeshProUGUI questItemNumberUI;
     public static InventoryManager Instance
     {
         get
@@ -38,14 +39,15 @@ public class InventoryManager : MonoBehaviour
         if (_instance == null)
         {
             _instance = this;
-            if (transform.parent != null)
-            {
-                transform.SetParent(null);
-            }
             DontDestroyOnLoad(gameObject);
         }
-
+        else if (_instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
     }
+
     /// <summary>
     /// Start is called on the frame when a script is enabled just before
     /// any of the Update methods is called the first time.
@@ -100,6 +102,12 @@ public class InventoryManager : MonoBehaviour
     void Update()
     {
         questItemNumber = countQuestItems();
+        GameObject questItem_temp = GameObject.Find("QuestItemNum");
+        if (questItem_temp != null)
+        {
+            questItemNumberUI = questItem_temp.GetComponent<TextMeshProUGUI>();
+            questItemNumberUI.text = countQuestItems().ToString() + "/" + GameManager.Instance.questItemsRequired.ToString();
+        }
         if (questItemNumber >= GameManager.Instance.questItemsRequired)
         {
             Debug.Log("End game");
@@ -117,19 +125,39 @@ public class InventoryManager : MonoBehaviour
             pickUp();
             SaveItemNames();
         }
-        if (itemToUse && ThirdPersonMovement.cursorLocked == false)
+        if (itemToUse && GameManager.cursorLocked == false)
         {
             if (Input.GetMouseButtonDown(0))
             {
                 placeObject();
             }
         }
+        GameObject finalNPC = GameObject.Find("FinalQuest");
+        GameObject firstNPC = GameObject.Find("NPC");
         if (GameManager.Instance.questItemsRequired <= questItemNumber)
         {
             TextMeshProUGUI text = GameObject.Find("CurrentDay").GetComponent<TextMeshProUGUI>();
             currentDay = text;
             currentDay.text = "You have all the items";
             GameManager.Instance.isQuestAchieved = true;
+
+            if (finalNPC != null)
+            {
+                finalNPC.SetActive(true);
+                if (firstNPC)
+                    firstNPC.SetActive(false);
+                // Debug.Log("yy");
+            }
+
+        }
+        else
+        {
+            if (finalNPC != null)
+            {
+                finalNPC.SetActive(false);
+                firstNPC.SetActive(true);
+            }
+            // Debug.Log("xx");
         }
     }
     private void placeObject()
@@ -182,6 +210,7 @@ public class InventoryManager : MonoBehaviour
         int i = 0;
         foreach (Item item in items)
         {
+            Debug.Log(item.itemType);
             if (item.itemType == itemType.QUEST)
             {
                 i++;

@@ -26,6 +26,9 @@ public class GameManager : MonoBehaviour
     public int difficultyLevel = 1;
     public bool isQuestAchieved = false;
     public GameObject finalNPC;
+    public float timeForNightDamage = 4.5f;
+
+    public static bool cursorLocked = true;
     private void Awake()
     {
         if (Instance == null)
@@ -63,19 +66,7 @@ public class GameManager : MonoBehaviour
 
         }
 
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            GameObject finalNPC = GameObject.Find("FinalQuest");
-            if (finalNPC != null)
-            {
-                finalNPC.SetActive(true);
-                Debug.Log("yy");
-            }
-            else
-            {
-                Debug.Log("xx");
-            }
-        }
+
     }
     private void Start()
     {

@@ -664,7 +664,7 @@ MonoBehaviour:
   delayAttackTime: 3
   animator: {fileID: 0}
   health: 20
-  movementSpeed: 0
+  movementSpeed: 6
   invincibleDelayTime: 0.05
   healthBar: {fileID: 1762520281577674871}
   playerLayer:
