@@ -90,7 +90,8 @@ public class ThirdPersonMovement : MonoBehaviour
         }
 
         BirdMovement();
-        Movement();
+        if (birdMode == false)
+            Movement();
         HealingAndDamage();
     }
     public void BirdMovement()

@@ -63,7 +63,6 @@ public class MapGenerator : MonoBehaviour
     }
     void Start()
     {
-        // Generowanie i rysowanie mapy przy uruchomieniu gry
 
     }
 
@@ -74,7 +73,6 @@ public class MapGenerator : MonoBehaviour
     public void DrawMapInEditor()
     {
         MapData mapData = GenerateMapData(Vector2.zero);
-        // MapDisplay mapDisplay = FindObjectOfType<MapDisplay>();
         meshFilter.sharedMesh = MeshGenerator.GenerateTerrainMesh(mapData.heightMap, meshHighMultiplier, meshHeightCurve, editorPreviewLOD, gradient).CreateMesh();
     }
 
