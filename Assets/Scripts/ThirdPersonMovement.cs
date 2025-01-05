@@ -97,7 +97,7 @@ public class ThirdPersonMovement : MonoBehaviour
     {
         if (birdRigidbody == null) return;
 
-        if (Input.GetKeyDown(KeyCode.O))
+        if (Input.GetKeyDown(KeyCode.O) && InventoryManager.Instance.birdAchieved)
         {
             birdMode = !birdMode;
         }

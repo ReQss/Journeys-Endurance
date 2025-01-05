@@ -129,7 +129,7 @@ public class EnemyAI : MonoBehaviour
         runningSound.enabled = true;
         attackingSound.enabled = false;
         agent.SetDestination(player.position);
-        agent.speed = 8;
+        agent.speed = movementSpeed;
     }
     private void Attacking()
     {

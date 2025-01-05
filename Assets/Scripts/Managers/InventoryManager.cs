@@ -20,6 +20,10 @@ public class InventoryManager : MonoBehaviour
     public TextMeshProUGUI currentDay;
     public TextMeshProUGUI questItemNumberUI;
     public Camera mainCamera;
+
+    public bool birdAchieved = false;
+    public int itemsToAchieveBird = 0;
+    public GameObject floatingIslandPortal;
     public static InventoryManager Instance
     {
         get
@@ -103,6 +107,12 @@ public class InventoryManager : MonoBehaviour
     void Update()
     {
         questItemNumber = countQuestItems();
+        if (questItemNumber >= itemsToAchieveBird)
+        {
+            if (floatingIslandPortal != null)
+                floatingIslandPortal.SetActive(true);
+        }
+        else floatingIslandPortal.SetActive(false);
         GameObject questItem_temp = GameObject.Find("QuestItemNum");
         if (questItem_temp != null)
         {

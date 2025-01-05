@@ -10,6 +10,7 @@ public class DialogueTrigger : MonoBehaviour
     public bool isSpecialAction;
     private Transform player;
     public float detectionRadius = 5f;
+    public bool eagleAchievedTrigger = false;
     /// <summary>
     /// Start is called on the frame when a script is enabled just before
     /// any of the Update methods is called the first time.
@@ -29,6 +30,10 @@ public class DialogueTrigger : MonoBehaviour
         {
             GameManager.cursorLocked = false;
             TriggerDialogue();
+            if (eagleAchievedTrigger)
+            {
+                InventoryManager.Instance.birdAchieved = true;
+            }
         }
     }
 }
