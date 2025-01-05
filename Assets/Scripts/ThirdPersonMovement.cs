@@ -20,7 +20,7 @@ public class ThirdPersonMovement : MonoBehaviour
     public GameObject birdCamera;
     public GameObject playerCamera;
     public Rigidbody birdRigidbody;
-    Camera camera;
+    public Camera camera;
 
 
     public float speed = 6;
@@ -39,7 +39,6 @@ public class ThirdPersonMovement : MonoBehaviour
 
     float turnSmoothVelocity;
     public float turnSmoothTime = 0.1f;
-    public float pickUpDistance = 80f;
     private float playerVelocity = 0.0f;
     public float acceleration = 0.1f;
     public float decceleration = 0.5f;
@@ -53,7 +52,7 @@ public class ThirdPersonMovement : MonoBehaviour
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
-        camera = Camera.main;
+        // camera = Camera.main;
         velocityHash = Animator.StringToHash("Velocity");
     }
 

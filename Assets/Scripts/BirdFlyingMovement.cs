@@ -36,9 +36,10 @@ public class BirdFlyingMovement : MonoBehaviour
 
     private void HandleMovement()
     {
-        float horizontal = Input.GetAxisRaw("Horizontal");
-        float vertical = Input.GetAxisRaw("Vertical");
+        float horizontal = -Input.GetAxisRaw("Horizontal"); // Invert horizontal input
+        float vertical = -Input.GetAxisRaw("Vertical");     // Invert vertical input
         Vector3 direction = new Vector3(horizontal, 0f, vertical).normalized;
+
 
         if (direction.magnitude >= 0.1f)
         {

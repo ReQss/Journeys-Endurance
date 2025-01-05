@@ -19,6 +19,7 @@ public class InventoryManager : MonoBehaviour
 
     public TextMeshProUGUI currentDay;
     public TextMeshProUGUI questItemNumberUI;
+    public Camera mainCamera;
     public static InventoryManager Instance
     {
         get
@@ -162,7 +163,7 @@ public class InventoryManager : MonoBehaviour
     }
     private void placeObject()
     {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
 
         // Perform raycast
@@ -182,7 +183,7 @@ public class InventoryManager : MonoBehaviour
     private void pickUp()
     {
         RaycastHit hit;
-        Camera camera = Camera.main;
+        Camera camera = mainCamera;
         Ray ray = camera.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out hit, pickUpDistance))
         {
