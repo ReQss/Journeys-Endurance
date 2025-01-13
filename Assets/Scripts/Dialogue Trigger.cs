@@ -11,6 +11,7 @@ public class DialogueTrigger : MonoBehaviour
     private Transform player;
     public float detectionRadius = 5f;
     public bool eagleAchievedTrigger = false;
+    public bool powerBookTrigger = false;
     /// <summary>
     /// Start is called on the frame when a script is enabled just before
     /// any of the Update methods is called the first time.
@@ -33,6 +34,10 @@ public class DialogueTrigger : MonoBehaviour
             if (eagleAchievedTrigger)
             {
                 InventoryManager.Instance.birdAchieved = true;
+            }
+            if (powerBookTrigger)
+            {
+                InventoryManager.Instance.powerBookAchieved = true;
             }
         }
     }

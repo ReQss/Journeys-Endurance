@@ -44,9 +44,9 @@ public class HealthBar : MonoBehaviour
         slider.value = health;
         fill.color = gradient.Evaluate(slider.normalizedValue);
     }
-    public void TakeDamage()
+    public void TakeDamage(int damage)
     {
-        this.health -= 1;
+        this.health -= damage;
         SetHealth(this.health);
         if (GameManager.Instance.playerHealth <= 0)
         {

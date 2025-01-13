@@ -24,6 +24,7 @@ public class EnemyAI : MonoBehaviour
     [SerializeField]
     private GameObject healthBar;
     public LayerMask playerLayer;
+    private bool isTakingBulletDamage = false;
 
     private void Start()
     {
@@ -147,17 +148,34 @@ public class EnemyAI : MonoBehaviour
     {
         isAttacking = false;
     }
-    IEnumerator TakeDamage(int damage)
+    public IEnumerator TakeDamage(int damage)
     {
+        if (isTakingDamage) yield break;
         isTakingDamage = true;
         health -= damage;
-        healthBar.GetComponent<HealthBar>().TakeDamage();
+        healthBar.GetComponent<HealthBar>().TakeDamage(damage);
         if (health <= 0)
         {
-            Invoke(nameof(DestroyEnemy), .5f);
+            Invoke(nameof(DestroyEnemy), 0.5f);
+            yield break;
         }
         yield return new WaitForSeconds(invincibleDelayTime);
         isTakingDamage = false;
+
+    }
+    public IEnumerator TakeBulletDamage(int damage)
+    {
+        if (isTakingBulletDamage) yield break;
+        isTakingBulletDamage = true;
+        health -= damage;
+        healthBar.GetComponent<HealthBar>().TakeDamage(damage);
+        if (health <= 0)
+        {
+            Invoke(nameof(DestroyEnemy), 0.5f);
+            yield break;
+        }
+        yield return new WaitForSeconds(1f);
+        isTakingBulletDamage = false;
 
     }
     private void OnCollisionEnter(Collision other)

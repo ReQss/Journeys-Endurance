@@ -39,6 +39,7 @@ public class GrassGenerator : MonoBehaviour
     private ComputeBuffer matrixBuffer;
 
     public float spacingFactor = 0.5f;
+    public int chanceForGrassSpawn = 4;
 
     void Start()
     {
@@ -90,6 +91,9 @@ public class GrassGenerator : MonoBehaviour
             {
                 if (index >= grassCount)
                     return;
+                int chanceForGrass = Random.Range(1, chanceForGrassSpawn);
+                if (chanceForGrass == 2) continue;
+
                 float randomPositionOffset = Random.Range(0f, 1f);
                 Vector3 position = new Vector3(
                     (x * cellSize) - (areaSize / 2f) + terrainCenter.x + randomPositionOffset

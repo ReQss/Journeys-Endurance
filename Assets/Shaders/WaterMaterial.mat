@@ -58,6 +58,6 @@ Material:
     - _WaveHeight: 0.01
     - _WaveSpeed: 1
     m_Colors:
-    - _BaseColor: {r: 0, g: 0.7861634, b: 0.7736543, a: 0}
+    - _BaseColor: {r: 0, g: 0.60323405, b: 1, a: 0}
     - _RippleColor: {r: 0.1589626, g: 0.7548167, b: 1.296158, a: 0}
   m_BuildTextureStacks: []

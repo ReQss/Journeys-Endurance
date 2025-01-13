@@ -22,8 +22,11 @@ public class InventoryManager : MonoBehaviour
     public Camera mainCamera;
 
     public bool birdAchieved = false;
+    public bool powerBookAchieved = false;
     public int itemsToAchieveBird = 0;
+    public int itemsToAchievePowerBook = 0;
     public GameObject floatingIslandPortal;
+    public GameObject floatingIslandPowerbook;
     public static InventoryManager Instance
     {
         get
@@ -80,7 +83,7 @@ public class InventoryManager : MonoBehaviour
         {
             foreach (Transform child in parentObject.transform)
             {
-                // Debug.Log($"Child Name: {child.gameObject.name}");
+                Debug.Log($"Child Name: {child.gameObject.name}");
                 gameItems.Add(child.GetComponent<Item>());
             }
         }
@@ -112,7 +115,12 @@ public class InventoryManager : MonoBehaviour
             if (floatingIslandPortal != null)
                 floatingIslandPortal.SetActive(true);
         }
-        else floatingIslandPortal.SetActive(false);
+        if (questItemNumber >= itemsToAchievePowerBook)
+        {
+            if (floatingIslandPowerbook != null)
+                floatingIslandPowerbook.SetActive(true);
+        }
+        else if (floatingIslandPortal != null) floatingIslandPortal.SetActive(false);
         GameObject questItem_temp = GameObject.Find("QuestItemNum");
         if (questItem_temp != null)
         {
@@ -194,6 +202,10 @@ public class InventoryManager : MonoBehaviour
     {
         RaycastHit hit;
         Camera camera = mainCamera;
+        if (camera == null)
+        {
+            camera = Camera.main;
+        }
         Ray ray = camera.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out hit, pickUpDistance))
         {

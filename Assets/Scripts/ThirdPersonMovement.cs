@@ -49,6 +49,10 @@ public class ThirdPersonMovement : MonoBehaviour
     public HealthBar healthBar;
     private bool isHealed = false;
     public bool birdMode;
+    private bool isAttacking = false;
+    public Transform attack_pos;
+    public GameObject bulletPrefab;
+    public PowerBar powerBar;
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
@@ -64,6 +68,8 @@ public class ThirdPersonMovement : MonoBehaviour
 
             GameManager.cursorLocked = !GameManager.cursorLocked;
         }
+
+
         if (!GameManager.cursorLocked)
         {
             Cursor.lockState = CursorLockMode.None;
@@ -89,7 +95,7 @@ public class ThirdPersonMovement : MonoBehaviour
         }
 
         BirdMovement();
-        if (birdMode == false)
+        if (birdMode == false && GameManager.cursorLocked)
             Movement();
         HealingAndDamage();
     }
@@ -115,9 +121,34 @@ public class ThirdPersonMovement : MonoBehaviour
             birdCamera.SetActive(false);
         }
     }
+    public void Attack()
+    {
+        if (isAttacking) return;
+        if (powerBar.slider.value <= 0) return;
+        isAttacking = true;
+        powerBar.UsePower();
+        animator.SetTrigger("Attack");
+        StartCoroutine(ResetAttack());
+        GameObject bullet = Instantiate(bulletPrefab, attack_pos.position, Quaternion.identity);
+
+        Rigidbody rb = bullet.GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.velocity = transform.forward * 40f;
+        }
+    }
+    private IEnumerator ResetAttack()
+    {
+        yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length);
+        isAttacking = false;
+    }
     public void Movement()
     {
-
+        if (Input.GetKey(KeyCode.Mouse0) && InventoryManager.Instance.powerBookAchieved)
+        {
+            Attack();
+        }
+        if (isAttacking) return;
         bool runPressed = Input.GetKey("right shift");
         inBase = Physics.CheckSphere(groundCheck.position, 5f, baseLayer);
         isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
@@ -199,7 +230,7 @@ public class ThirdPersonMovement : MonoBehaviour
     public void TakeDamage()
     {
         GameManager.Instance.playerHealth -= 1;
-        healthBar.TakeDamage();
+        healthBar.TakeDamage(1);
     }
     public void HealPlayer()
     {
