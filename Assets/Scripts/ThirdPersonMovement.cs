@@ -27,8 +27,8 @@ public class ThirdPersonMovement : MonoBehaviour
     public float runSpeed = 1.5f;
     public float gravity = -9.81f;
     public float jumpHeight = 3;
-    public AnimationCurve jumpCurve; // Add this curve for jump
-    private float jumpTime; // Track time for jump curve
+    public AnimationCurve jumpCurve;
+    private float jumpTime;
     private bool isJumping = false;
     Vector3 velocity;
     public bool isGrounded;
@@ -51,8 +51,13 @@ public class ThirdPersonMovement : MonoBehaviour
     public bool birdMode;
     private bool isAttacking = false;
     public Transform attack_pos;
-    public GameObject bulletPrefab;
+    [SerializeField]
+    public List<GameObject> bulletPrefabs;
+    [SerializeField]
+    public List<GameObject> areaBulletPrefabs;
+    // public GameObject bulletPrefab;
     public PowerBar powerBar;
+    int currentBulletIndex = 0;
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
@@ -62,6 +67,14 @@ public class ThirdPersonMovement : MonoBehaviour
 
     void Update()
     {
+        if (Input.GetKey(KeyCode.Alpha1))
+        {
+            currentBulletIndex = 0;
+        }
+        else if (Input.GetKey(KeyCode.Alpha2))
+        {
+            currentBulletIndex = 1;
+        }
         if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl))
         {
             // Debug.Log(cursorLocked);
@@ -126,10 +139,10 @@ public class ThirdPersonMovement : MonoBehaviour
         if (isAttacking) return;
         if (powerBar.slider.value <= 0) return;
         isAttacking = true;
-        powerBar.UsePower();
+        powerBar.UsePower(1);
         animator.SetTrigger("Attack");
         StartCoroutine(ResetAttack());
-        GameObject bullet = Instantiate(bulletPrefab, attack_pos.position, Quaternion.identity);
+        GameObject bullet = Instantiate(bulletPrefabs[currentBulletIndex], attack_pos.position, Quaternion.identity);
 
         Rigidbody rb = bullet.GetComponent<Rigidbody>();
         if (rb != null)
@@ -142,11 +155,26 @@ public class ThirdPersonMovement : MonoBehaviour
         yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length);
         isAttacking = false;
     }
+    public void AreaAttack()
+    {
+        if (isAttacking) return;
+        if (powerBar.slider.value < 4) return;
+        isAttacking = true;
+        powerBar.UsePower(4);
+        animator.SetTrigger("Attack2");
+        StartCoroutine(ResetAttack());
+        GameObject bullet = Instantiate(areaBulletPrefabs[0], attack_pos.position, Quaternion.identity);
+
+    }
     public void Movement()
     {
         if (Input.GetKey(KeyCode.Mouse0) && InventoryManager.Instance.powerBookAchieved)
         {
             Attack();
+        }
+        else if (Input.GetKey(KeyCode.Mouse1) && InventoryManager.Instance.powerBookAchieved)
+        {
+            AreaAttack();
         }
         if (isAttacking) return;
         bool runPressed = Input.GetKey("right shift");

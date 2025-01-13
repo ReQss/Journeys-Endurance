@@ -9,17 +9,19 @@ public class MagicBullet : MonoBehaviour
     public float radius = 5f;
     public float moveSpeed = 5f;
     private bool wasEnemyFounded = false;
-    void Start()
+    public Collider closestObject = null;
+    public int bulletDamage = 1;
+    public float destroyBulletTime = 15f;
+    public void Start()
     {
 
         StartCoroutine(DestroyBullet());
     }
 
     // Update is called once per frame
-    void Update()
+    public void Update()
     {
         Collider[] foundObjects = Physics.OverlapSphere(transform.position, radius, layer);
-        Collider closestObject = null;
         float closestDistance = Mathf.Infinity;
         foreach (Collider collider in foundObjects)
         {
@@ -40,7 +42,7 @@ public class MagicBullet : MonoBehaviour
             EnemyAI foundedEnemy = closestObject.GetComponent<EnemyAI>();
             if (foundedEnemy != null)
             {
-                StartCoroutine(foundedEnemy.TakeBulletDamage(1));
+                StartCoroutine(foundedEnemy.TakeBulletDamage(bulletDamage));
             }
 
         }
@@ -49,9 +51,9 @@ public class MagicBullet : MonoBehaviour
             Destroy(gameObject);
         }
     }
-    private IEnumerator DestroyBullet()
+    public IEnumerator DestroyBullet()
     {
-        yield return new WaitForSeconds(15f);
+        yield return new WaitForSeconds(destroyBulletTime);
         Destroy(gameObject);
         yield return null;
     }

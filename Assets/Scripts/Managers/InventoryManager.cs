@@ -76,20 +76,20 @@ public class InventoryManager : MonoBehaviour
     }
     public void LoadGameItemsPrefabs()
     {
-        Debug.Log("Loading inventory games");
+        // Debug.Log("Loading inventory games");
         gameItems.Clear();
         GameObject parentObject = GameObject.Find("GameItemPrefabs");
         if (parentObject != null)
         {
             foreach (Transform child in parentObject.transform)
             {
-                Debug.Log($"Child Name: {child.gameObject.name}");
+                // Debug.Log($"Child Name: {child.gameObject.name}");
                 gameItems.Add(child.GetComponent<Item>());
             }
         }
         else
         {
-            Debug.LogWarning("Parent GameObject not found in the scene.");
+            // Debug.LogWarning("Parent GameObject not found in the scene.");
         }
     }
     public void LoadItems()

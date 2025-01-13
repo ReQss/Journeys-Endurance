@@ -25,6 +25,7 @@ public class EnemyAI : MonoBehaviour
     private GameObject healthBar;
     public LayerMask playerLayer;
     private bool isTakingBulletDamage = false;
+    public bool isFrozen = false;
 
     private void Start()
     {
@@ -110,7 +111,7 @@ public class EnemyAI : MonoBehaviour
         {
             isWalking = false;
         }
-        agent.speed = 3;
+        agent.speed = movementSpeed / 2;
     }
     private Vector3 LookForWalkPoint()
     {

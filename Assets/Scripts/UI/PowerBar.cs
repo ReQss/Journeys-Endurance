@@ -26,9 +26,9 @@ public class PowerBar : MonoBehaviour
         slider.value++;
         isRegenerating = false;
     }
-    public void UsePower()
+    public void UsePower(int val)
     {
-        slider.value -= 1;
+        slider.value -= val;
     }
 
 }
