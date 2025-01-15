@@ -173,6 +173,7 @@ public class EnemyAI : MonoBehaviour
         if (health <= 0)
         {
             Invoke(nameof(DestroyEnemy), 0.5f);
+            GameManager.Instance.defeatedEnemiesCount++;
             yield break;
         }
         yield return new WaitForSeconds(1f);

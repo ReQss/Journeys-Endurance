@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -29,6 +30,8 @@ public class GameManager : MonoBehaviour
     public float timeForNightDamage = 4.5f;
 
     public static bool cursorLocked = true;
+    public int defeatedEnemiesCount = 0;
+    public TextMeshProUGUI defeatedEnemiesCountUI;
     private void Awake()
     {
         if (Instance == null)
@@ -44,6 +47,8 @@ public class GameManager : MonoBehaviour
     }
     void Update()
     {
+        if (defeatedEnemiesCountUI != null)
+            defeatedEnemiesCountUI.text = defeatedEnemiesCount.ToString();
         if (isQuestAchieved)
         {
             if (finalNPC != null)

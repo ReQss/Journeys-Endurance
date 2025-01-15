@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 using System.Threading;
 using Cinemachine;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ThirdPersonMovement : MonoBehaviour
 {
@@ -58,15 +59,29 @@ public class ThirdPersonMovement : MonoBehaviour
     // public GameObject bulletPrefab;
     public PowerBar powerBar;
     int currentBulletIndex = 0;
+    [SerializeField]
+    List<Sprite> normalSpellSprites;
+    public Image currentSpellIcon;
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
         // camera = Camera.main;
         velocityHash = Animator.StringToHash("Velocity");
     }
-
+    public void ChangeNormalSpellUI()
+    {
+        if (normalSpellSprites.Count <= 0) return;
+        for (int i = 0; i < normalSpellSprites.Count; i++)
+        {
+            if (i == currentBulletIndex)
+            {
+                currentSpellIcon.sprite = normalSpellSprites[i];
+            }
+        }
+    }
     void Update()
     {
+        ChangeNormalSpellUI();
         if (Input.GetKey(KeyCode.Alpha1))
         {
             currentBulletIndex = 0;
