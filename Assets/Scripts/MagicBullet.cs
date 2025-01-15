@@ -42,7 +42,8 @@ public class MagicBullet : MonoBehaviour
             EnemyAI foundedEnemy = closestObject.GetComponent<EnemyAI>();
             if (foundedEnemy != null)
             {
-                StartCoroutine(foundedEnemy.TakeBulletDamage(bulletDamage));
+                if (bulletDamage != 0)
+                    StartCoroutine(foundedEnemy.TakeBulletDamage(bulletDamage));
             }
 
         }
