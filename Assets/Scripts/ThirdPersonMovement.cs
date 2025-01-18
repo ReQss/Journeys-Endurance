@@ -272,6 +272,7 @@ public class ThirdPersonMovement : MonoBehaviour
     }
     public void TakeDamage()
     {
+        if (GameManager.Instance.isInvincible == true) return;
         GameManager.Instance.playerHealth -= 1;
         healthBar.TakeDamage(1);
     }

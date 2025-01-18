@@ -26,9 +26,18 @@ public class EnemyAI : MonoBehaviour
     public LayerMask playerLayer;
     private bool isTakingBulletDamage = false;
     public bool isFrozen = false;
+    private BoxCollider damageCollider;
+    public bool canAttack = false;
 
     private void Start()
     {
+        damageCollider = GetComponent<BoxCollider>();
+
+        // Ensure the collider is set to trigger mode
+        if (damageCollider != null && !damageCollider.isTrigger)
+        {
+            Debug.LogWarning("The BoxCollider must be set as a trigger.");
+        }
         healthBar.GetComponent<HealthBar>().SetMaxHealth(health);
     }
     private void Awake()
@@ -48,12 +57,14 @@ public class EnemyAI : MonoBehaviour
         }
         if (!playerInSightRange && !playerInAttackRange && !isAttacking)
         {
+            canAttack = false;
             Patrolling();
             animator.SetFloat("Speed", 0.5f);
             animator.SetBool("isAttacking", false);
         }
         else if (playerInSightRange && !playerInAttackRange && !isAttacking)
         {
+            canAttack = false;
             Chasing();
             animator.SetFloat("Speed", 1f);
             animator.SetBool("isAttacking", false);
@@ -61,27 +72,46 @@ public class EnemyAI : MonoBehaviour
         }
         else
         {
+            canAttack = true;
             Attacking();
             animator.SetBool("isAttacking", true);
-            StartCoroutine(CheckForDamage());
+            // StartCoroutine(CheckForDamage());
         }
     }
-    private IEnumerator CheckForDamage()
-    {
-        yield return new WaitForSeconds(.5f);
-        Collider[] hitColliders = Physics.OverlapSphere(transform.position, 1.8f, playerLayer);
-        foreach (var collider in hitColliders)
-        {
-            if (collider.CompareTag("Player") && GameManager.Instance.isInvincible == false)
-            {
-                Debug.Log("Hit player");
-                player.GetComponent<ThirdPersonMovement>().TakeDamage();
-                GameManager.Instance.isInvincible = true;
-                yield return new WaitForSeconds(1f);
-                GameManager.Instance.isInvincible = false;
-            }
-        }
+    // private IEnumerator CheckForDamage()
+    // {
+    //     yield return new WaitForSeconds(.5f);
+    //     Collider[] hitColliders = Physics.OverlapSphere(transform.position, 1.8f, playerLayer);
+    //     foreach (var collider in hitColliders)
+    //     {
+    //         if (collider.CompareTag("Player") && GameManager.Instance.isInvincible == false)
+    //         {
+    //             Debug.Log("Hit player");
+    //             player.GetComponent<ThirdPersonMovement>().TakeDamage();
+    //             GameManager.Instance.isInvincible = true;
+    //             yield return new WaitForSeconds(1f);
+    //             GameManager.Instance.isInvincible = false;
+    //         }
+    //     }
 
+    // }
+    private IEnumerator InvicibleTime()
+    {
+        GameManager.Instance.isInvincible = true;
+        yield return new WaitForSeconds(0.3f);
+        GameManager.Instance.isInvincible = false;
+    }
+
+
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Player") && other.transform.root.CompareTag("Player") & canAttack)
+        {
+            other.GetComponent<ThirdPersonMovement>().TakeDamage();
+            Debug.Log("Player damaged");
+            StartCoroutine(InvicibleTime());
+        }
     }
     private IEnumerator resetPoint()
     {

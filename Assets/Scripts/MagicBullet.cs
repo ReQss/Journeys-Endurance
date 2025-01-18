@@ -8,7 +8,7 @@ public class MagicBullet : MonoBehaviour
     public LayerMask layer;
     public float radius = 5f;
     public float moveSpeed = 5f;
-    private bool wasEnemyFounded = false;
+    public bool wasEnemyFounded = false;
     public Collider closestObject = null;
     public int bulletDamage = 1;
     public float destroyBulletTime = 15f;
