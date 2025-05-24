@@ -75,26 +75,9 @@ public class EnemyAI : MonoBehaviour
             canAttack = true;
             Attacking();
             animator.SetBool("isAttacking", true);
-            // StartCoroutine(CheckForDamage());
         }
     }
-    // private IEnumerator CheckForDamage()
-    // {
-    //     yield return new WaitForSeconds(.5f);
-    //     Collider[] hitColliders = Physics.OverlapSphere(transform.position, 1.8f, playerLayer);
-    //     foreach (var collider in hitColliders)
-    //     {
-    //         if (collider.CompareTag("Player") && GameManager.Instance.isInvincible == false)
-    //         {
-    //             Debug.Log("Hit player");
-    //             player.GetComponent<ThirdPersonMovement>().TakeDamage();
-    //             GameManager.Instance.isInvincible = true;
-    //             yield return new WaitForSeconds(1f);
-    //             GameManager.Instance.isInvincible = false;
-    //         }
-    //     }
 
-    // }
     private IEnumerator InvicibleTime()
     {
         GameManager.Instance.isInvincible = true;

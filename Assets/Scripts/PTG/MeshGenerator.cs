@@ -79,7 +79,7 @@ public class MeshData
         mesh.vertices = vertices;
         mesh.triangles = triangles;
         mesh.uv = uvs;
-        mesh.colors = colors;  // Add this line
+        mesh.colors = colors;
         mesh.RecalculateNormals();
         return mesh;
     }

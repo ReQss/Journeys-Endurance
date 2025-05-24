@@ -76,21 +76,16 @@ public class InventoryManager : MonoBehaviour
     }
     public void LoadGameItemsPrefabs()
     {
-        // Debug.Log("Loading inventory games");
         gameItems.Clear();
         GameObject parentObject = GameObject.Find("GameItemPrefabs");
         if (parentObject != null)
         {
             foreach (Transform child in parentObject.transform)
             {
-                // Debug.Log($"Child Name: {child.gameObject.name}");
                 gameItems.Add(child.GetComponent<Item>());
             }
         }
-        else
-        {
-            // Debug.LogWarning("Parent GameObject not found in the scene.");
-        }
+
     }
     public void LoadItems()
     {
@@ -99,7 +94,6 @@ public class InventoryManager : MonoBehaviour
         {
             foreach (Item game_item in gameItems)
             {
-                // Debug.Log(game_item.itemName + " + " + itemName);
                 if (game_item.itemName.Equals(itemName))
                 {
                     items.Add(game_item);
@@ -165,7 +159,6 @@ public class InventoryManager : MonoBehaviour
                 finalNPC.SetActive(true);
                 if (firstNPC)
                     firstNPC.SetActive(false);
-                // Debug.Log("yy");
             }
 
         }
@@ -183,14 +176,11 @@ public class InventoryManager : MonoBehaviour
     {
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
-
-        // Perform raycast
         if (Physics.Raycast(ray, out hit, 20))
         {
             GameObject newGameObject = Instantiate(itemToUse, hit.point, Quaternion.identity);
             if (newGameObject.GetComponent<Item>().itemType == itemType.QUEST)
             {
-                // newGameObject.transform.eulerAngles = new Vector3(90f, 0f, 0f);
                 newGameObject.transform.position = new Vector3(hit.point.x, hit.point.y + 1.5f, hit.point.z);
             }
             newGameObject.SetActive(true);
@@ -209,10 +199,7 @@ public class InventoryManager : MonoBehaviour
         Ray ray = camera.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out hit, pickUpDistance))
         {
-
-            // Debug.Log(hit.collider.gameObject.name);
             Item interactable = hit.collider.GetComponent<Item>();
-
             if (interactable != null)
             {
                 if (interactable.pickedUp == false && interactable.isNearbyPlayer)
@@ -220,9 +207,7 @@ public class InventoryManager : MonoBehaviour
                     InventoryManager.Instance.addItem(interactable);
                     interactable.gameObject.SetActive(false);
                     interactable.pickedUp = true;
-
                 }
-
                 Debug.Log("Interact");
             }
 

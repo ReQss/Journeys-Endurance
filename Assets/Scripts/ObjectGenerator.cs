@@ -59,11 +59,9 @@ public class ObjectGenerator : MonoBehaviour
                 continue;
             }
             else positionClear = true;
-
             if (hit.point.y < ySize.x || hit.point.y > ySize.y) continue;
             if (hit.collider.tag == "Ground")
             {
-
                 Ray objectRay = new Ray(randomPosition, Vector3.down);
                 Debug.DrawRay(randomPosition, Vector3.down * hit.distance, Color.red);
                 GameObject randomPrefab = getRandomObject();
@@ -71,12 +69,9 @@ public class ObjectGenerator : MonoBehaviour
                 spawnedObject.transform.SetParent(instantiatedObjectsFolder.transform);
                 positionFound = true;
             }
-
-
             Debug.DrawRay(randomPosition, Vector3.down * 10, Color.red, 1.0f);
             attempts++;
         }
-
     }
 
 
